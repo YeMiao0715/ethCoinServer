@@ -1,0 +1,60 @@
+import { TokenServer } from './TokenServer';
+import { web3 } from './../config/web3.config';
+import { Transaction as Tx } from 'ethereumjs-tx';
+import getAddressNonce from '../lib/getAddressNonce';
+
+export class TransactionServer {
+
+  
+  async buildTokenTransaction(contractAddress: string, from: string, to: string, amount: string| number = 'all') {
+    const tokenServer = new TokenServer(contractAddress);
+    await tokenServer.contractInit();
+    let abiData: string;
+    if(amount == 'all') {
+      amount = await tokenServer.getTokenAmount(from);
+      abiData = await tokenServer.buildTransactionAbiData(to, amount);
+    }else{
+      abiData = await tokenServer.buildTransactionAbiData(to, amount);
+    }
+
+    const gasObj = await tokenServer.calcTokenGas(from, to, amount);
+    const nonce = await this.getAddressNonce(from);
+
+    return {
+      nonce,
+      gasPrice: gasObj.gasPrice,
+      gasLimit: gasObj.gasLimit,
+      data: abiData
+    }
+  }
+
+  async buildEthTransaction(from: string, to: string, amount: string|number = 'all') {
+
+  }
+
+  async getAddressNonce(address: string) {
+    return await getAddressNonce(address);
+  }
+
+  /**
+   * 签名交易
+   * @param {object} transaction
+   * @param {string} privateKey
+   * @returns
+   * @memberof TransactionServer
+   */
+  async signTransaction(transaction: object, privateKey: string) {
+    Object.keys(transaction).map(key => {
+      if(['to','data'].includes(key) === false) {
+        transaction[key] = web3.utils.toHex(transaction[key]);
+      }
+    });
+
+    const bufferKey = Buffer.from(privateKey.replace('0x', ''), 'hex');
+    const tx = new Tx(transaction);
+    tx.sign(bufferKey);
+    const serializedTx = tx.serialize();
+    return `0x${serializedTx.toString('hex')}`;
+  }
+
+}

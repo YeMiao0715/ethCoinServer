@@ -1,0 +1,24 @@
+{
+   "type": "mysql",
+   "host": "localhost",
+   "port": 3306,
+   "username": "root",
+   "password": "",
+   "database": "cet_eth_db",
+   "synchronize": true,
+   "logging": false,
+   "entities": [
+      "database/entity/**/*.ts"
+   ],
+   "migrations": [
+      "database/migration/**/*.ts"
+   ],
+   "subscribers": [
+      "database/subscriber/**/*.ts"
+   ],
+   "cli": {
+      "entitiesDir": "database/entity",
+      "migrationsDir": "database/migration",
+      "subscribersDir": "database/subscriber"
+   }
+}

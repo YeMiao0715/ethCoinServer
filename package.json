@@ -1,0 +1,32 @@
+{
+   "name": "cet_eth_server",
+   "version": "1.0.0",
+   "description": "eth交互服务",
+   "main": "index.js",
+   "author": "YeMiao",
+   "license": "MIT",
+   "dependencies": {
+      "@types/ethereumjs-tx": "^1.0.1",
+      "decimal.js": "^10.2.0",
+      "dotenv": "^8.0.0",
+      "ethereumjs-tx": "^2.1.0",
+      "jayson": "^3.0.2",
+      "log4js": "^4.5.1",
+      "mysql": "^2.14.1",
+      "reflect-metadata": "^0.1.10",
+      "typeorm": "0.2.18",
+      "web3": "^1.2.0"
+   },
+   "devDependencies": {
+      "@types/mocha": "^5.2.7",
+      "@types/node": "^8.0.29",
+      "@types/web3": "^1.0.19",
+      "mocha": "^6.1.4",
+      "ts-node": "3.3.0",
+      "typescript": "3.3.3333"
+   },
+   "scripts": {
+      "start": "ts-node src/index.ts",
+      "test": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/*.test.ts"
+   }
+}
