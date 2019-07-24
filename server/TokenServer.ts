@@ -43,7 +43,7 @@ export class TokenServer {
    */
   async getTokenAmount(address: string) {
     const tokenAmount = await this.contract.methods.balanceOf(address).call();
-    return new dec(tokenAmount).div(this.contractDecimal).toFixed();
+    return new dec(tokenAmount).div(10 ** this.contractDecimal).toString();
   }
 
 

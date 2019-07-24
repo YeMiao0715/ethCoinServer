@@ -33,7 +33,10 @@ export class EthServer {
       value: web3.utils.toWei(value.toString(),'ether')
     });
 
-    return web3.utils.fromWei(new dec(gasPrice).mul(gasLimit).toFixed());
+    return {
+      gasLimit, gasPrice,
+      gas: web3.utils.fromWei(new dec(gasPrice).mul(gasLimit).toFixed())
+    }
   }
   
 }
