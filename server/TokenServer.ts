@@ -84,6 +84,14 @@ export class TokenServer {
     }
   }
 
-  
+  async getTokenPastEvent(address) {
 
+    const events = await this.contract.getPastEvents('allEvents', {
+      fromBlock: 8103026,
+      toBlock: 'latest'
+    });
+
+    console.log(events);
+  }
 }
+

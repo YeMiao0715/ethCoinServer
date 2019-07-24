@@ -27,6 +27,6 @@
    },
    "scripts": {
       "start": "ts-node src/index.ts",
-      "test": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/*.test.ts"
+      "test": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/*.test.ts --timeout 50000"
    }
 }

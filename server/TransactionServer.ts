@@ -6,7 +6,6 @@ import { EthServer } from './EthServer';
 import dec from 'decimal.js';
 
 export class TransactionServer {
-
   
   /**
    * 构建代币转移TxObj
@@ -62,7 +61,6 @@ export class TransactionServer {
     }else{
       gasObj = await ethServer.calcEthGas(from, to, amount);
     }
-
     
     const nonce = await this.getAddressNonce(from);
     
@@ -96,6 +94,17 @@ export class TransactionServer {
     tx.sign(bufferKey);
     const serializedTx = tx.serialize();
     return `0x${serializedTx.toString('hex')}`;
+  }
+
+
+  /**
+   * 发送交易
+   * @param {string} Tx
+   * @returns
+   * @memberof TransactionServer
+   */
+  sendTransaction(Tx: string) {
+    return web3.eth.sendSignedTransaction(Tx);
   }
 
 }
