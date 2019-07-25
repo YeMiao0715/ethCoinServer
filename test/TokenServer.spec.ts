@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { TokenServer } from './../server/TokenServer';
+import { TokenServer } from '../server/TokenServer';
 import { db } from '../database/database';
 
 

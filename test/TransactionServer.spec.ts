@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { TransactionServer } from './../server/TransactionServer';
+import { TransactionServer } from '../server/TransactionServer';
 import { db } from "../database/database";
 
 describe('TransactionServer test', () => {

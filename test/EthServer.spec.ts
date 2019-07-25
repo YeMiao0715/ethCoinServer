@@ -1,4 +1,4 @@
-import { EthServer } from './../server/EthServer';
+import { EthServer } from '../server/EthServer';
 import { db } from "../database/database";
 import { expect } from 'chai';
 
