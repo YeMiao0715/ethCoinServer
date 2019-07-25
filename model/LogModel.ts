@@ -12,8 +12,7 @@ export class LogModel {
   static SCENE_SYSTEM_INFO: number = 0;
   static SCENE_ETH_INFO: number = 1;
   static SCENE_TOKEN_INFO: number = 2;
-  static SCENE_WEB_INFO: number = 3;
-  
+  static SCENE_HTTPS_INFO: number = 3;
   
   /**
    * 添加普通日志
