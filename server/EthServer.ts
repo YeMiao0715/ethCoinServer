@@ -1,6 +1,17 @@
 import { web3 } from "../config/web3.config";
 import dec from 'decimal.js';
 
+export interface GasObj {
+  gasLimit: number,
+  gasPrice: number,
+  gas: string
+}
+
+/**
+ * eth服务
+ * @export
+ * @class EthServer
+ */
 export class EthServer {
 
   /**
@@ -35,7 +46,7 @@ export class EthServer {
 
     return {
       gasLimit, gasPrice,
-      gas: web3.utils.fromWei(new dec(gasPrice).mul(gasLimit).toFixed())
+      gasToEth: web3.utils.fromWei(new dec(gasPrice).mul(gasLimit).toFixed())
     }
   }
   

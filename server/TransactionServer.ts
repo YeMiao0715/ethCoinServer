@@ -38,7 +38,6 @@ export class TransactionServer {
     }
   }
 
-
   /**
    * 构建Eth 转移
    * @param {string} from
@@ -51,13 +50,13 @@ export class TransactionServer {
     let gasObj: {
       gasLimit: number;
       gasPrice: number;
-      gas: string;
+      gasToEth: string;
     };
 
     if(amount === 'all') {
       amount = await ethServer.getEthAmount(from);
       gasObj = await ethServer.calcEthGas(from, to, amount);
-      amount = new dec(amount).sub(gasObj.gas).toString();
+      amount = new dec(amount).sub(gasObj.gasToEth).toString();
     }else{
       gasObj = await ethServer.calcEthGas(from, to, amount);
     }

@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity() 
-class EthTaskEvent {
+export class EthTaskEvent {
 
   @PrimaryGeneratedColumn()
   id: number;
@@ -13,7 +13,7 @@ class EthTaskEvent {
   event_type: string;
 
   @Column({
-    length: 1,
+    type: 'integer',
     comment: '事件标识[1: sendEthTransaction][2:sendTokenTransaction]'
   })
   type: number;
@@ -22,20 +22,42 @@ class EthTaskEvent {
   coin_name: string;
 
   @Column({
-    length: 1,
+    type: 'text',
+    comment: '事件参数'
+  })
+  event_param: string;
+
+  @Column({
+    type: 'integer',
     comment: '状态[1: 进行中][2:已完成]'
   })
   state: number;
 
   @Column({
-    length: 1,
+    comment: '状态运行信息或错误信息',
+    nullable: true,
+    default: null
+  })
+  state_message: string;
+
+  @Column({
+    type: 'integer',
     comment: '回调状态[0: 未回掉][1: 回调成功][2: 回调失败]'
   })
-  callback_state: string;
+  callback_state: number;
+
+  @Column({
+    comment: '回调状态信息或错误信息',
+    nullable: true,
+    default: null
+  })
+  callback_state_message: string;
 
   @Column({
     type: 'text',
-    comment: '交易信息'
+    comment: '交易信息',
+    nullable: true,
+    default: null
   })
   extends: string;
 
