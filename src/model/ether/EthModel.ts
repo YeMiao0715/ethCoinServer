@@ -4,7 +4,7 @@ import dec from 'decimal.js';
 export interface GasObj {
   gasLimit: number,
   gasPrice: number,
-  gas: string
+  gasToEth: string
 }
 
 /**

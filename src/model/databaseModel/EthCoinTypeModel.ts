@@ -132,7 +132,7 @@ export class EthCoinTypeModel {
 
     if(find === undefined) {
       SystemRunLogModel.error(`合约地址${contract_address}不存在`, SystemRunLogModel.SCENE_TOKEN_INFO);
-      throw new Error(`合约地址${contract_address}不存在`);
+      throw new Error(`合约地址${contract_address}不支持`);
     }else{
       let abi: any[];
       let calcGasAddress: string; 

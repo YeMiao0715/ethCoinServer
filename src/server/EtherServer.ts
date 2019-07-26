@@ -1,6 +1,6 @@
 import { TokenModel } from '../model/ether/TokenModel';
 import { EthCoinTypeModel } from '../model/databaseModel/EthCoinTypeModel';
-import { EthModel } from "../model/ether/EthModel";
+import { EthModel, GasObj } from "../model/ether/EthModel";
 
 export class EtherServer {
 
@@ -57,6 +57,27 @@ export class EtherServer {
         break;
     }
     return amountObj;
+  }
+
+
+  /**
+   * 计算交易所需gas费用
+   * @param {string} from
+   * @param {string} to
+   * @param {(string| undefined)} contractAddress
+   * @returns
+   * @memberof EtherServer
+   */
+  async calcGasToEthAmount(from: string, to: string, contractAddress: string| undefined) {
+    let gasObj: GasObj;
+    if(contractAddress !== undefined) {
+      const tokenModel = new TokenModel(contractAddress);
+      await tokenModel.contractInit();
+      gasObj = await tokenModel.calcTokenGas(from, to, 0);
+    }else{
+      gasObj = await this.ethModel.calcEthGas(from, to, 0);
+    }
+    return gasObj;
   }
 
 }

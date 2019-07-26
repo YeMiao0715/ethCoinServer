@@ -262,6 +262,11 @@
   resolved "https://registry.npm.taobao.org/@types/underscore/download/@types/underscore-1.9.2.tgz#2c4f7743287218f5c2d9a83db3806672aa48530d"
   integrity sha1-LE93QyhyGPXC2ag9s4BmcqpIUw0=
 
+"@types/validator@^10.11.2":
+  version "10.11.2"
+  resolved "https://registry.npm.taobao.org/@types/validator/download/@types/validator-10.11.2.tgz#48b60ca2cca927081f37a1ad1de3e25d04abc9f0"
+  integrity sha1-SLYMosypJwgfN6GtHePiXQSryfA=
+
 "@types/web3@^1.0.19":
   version "1.0.19"
   resolved "https://registry.npm.taobao.org/@types/web3/download/@types/web3-1.0.19.tgz#46b85d91d398ded9ab7c85a5dd57cb33ac558924"
@@ -4062,6 +4067,11 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
+
+validator@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.npm.taobao.org/validator/download/validator-11.1.0.tgz#ac18cac42e0aa5902b603d7a5d9b7827e2346ac4"
+  integrity sha1-rBjKxC4KpZArYD16XZt4J+I0asQ=
 
 vary@^1, vary@^1.1.2, vary@~1.1.2:
   version "1.1.2"

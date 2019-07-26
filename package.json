@@ -17,6 +17,7 @@
       "mysql": "^2.14.1",
       "reflect-metadata": "^0.1.10",
       "typeorm": "0.2.18",
+      "validator": "^11.1.0",
       "web3": "^1.2.0"
    },
    "devDependencies": {
@@ -28,6 +29,7 @@
       "@types/koa-router": "^7.0.42",
       "@types/mocha": "^5.2.7",
       "@types/node": "^8.0.29",
+      "@types/validator": "^10.11.2",
       "@types/web3": "^1.0.19",
       "chai": "^4.2.0",
       "mocha": "^6.1.4",

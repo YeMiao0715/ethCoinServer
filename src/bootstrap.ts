@@ -39,13 +39,13 @@ function checkIp(ip: string) {
 app.use(bodyParser());
 
 app.use(async (ctx, next) => {
+  
+  WebRunLogModel.info(ctx.method, ctx.url, ctx.request.body, ctx.ip);
   // 安全组检测
   if(checkIp(ctx.ip) === false) {
     ctx.throw(403, '权限不足');
   }
 
-  WebRunLogModel.info(ctx.method, ctx.url, ctx.request.body, ctx.ip);
-  
   // 设置响应头
   ctx.set('Content-Type', 'application/json;charset: UTF-8');
   await next();
