@@ -1,14 +1,14 @@
 import Contract from "web3/eth/contract";
-import { web3 } from "../config/web3.config";
-import { EthCoinTypeModel } from "../model/EthCoinTypeModel";
+import { web3 } from "../../config/web3.config";
+import { EthCoinTypeModel } from "../databaseModel/EthCoinTypeModel";
 import dec from 'decimal.js';
 
 /**
  * 代币服务
  * @export
- * @class TokenServer
+ * @class TokenModel
  */
-export class TokenServer {
+export class TokenModel {
 
   private contract: Contract;
 
@@ -23,7 +23,7 @@ export class TokenServer {
 
   /**
    * 合约初始化
-   * @memberof TokenServer
+   * @memberof TokenModel
    */
   async contractInit() {
     const ethCoinTypeModel = new EthCoinTypeModel;
@@ -39,7 +39,7 @@ export class TokenServer {
    * 获取代币余额
    * @param {string} address
    * @returns
-   * @memberof TokenServer
+   * @memberof TokenModel
    */
   async getTokenAmount(address: string) {
     const tokenAmount = await this.contract.methods.balanceOf(address).call();
@@ -52,7 +52,7 @@ export class TokenServer {
    * @param {string} to
    * @param {(string|number)} tokenAmount
    * @returns
-   * @memberof TokenServer
+   * @memberof TokenModel
    */
   async buildTransactionAbiData(to: string, tokenAmount: string|number) {
     tokenAmount = new dec(tokenAmount).mul(10 ** this.contractDecimal).toString();
@@ -67,7 +67,7 @@ export class TokenServer {
    * @param {string} to
    * @param {(string|number)} tokenAmount
    * @returns
-   * @memberof TokenServer
+   * @memberof TokenModel
    */
   async calcTokenGas(from: string, to: string, tokenAmount: string|number) {
     const gasPrice = await web3.eth.getGasPrice();

@@ -1,11 +1,11 @@
-import { TokenServer } from './TokenServer';
-import { web3 } from './../config/web3.config';
+import { TokenModel } from './TokenModel';
+import { web3 } from '../../config/web3.config';
 import { Transaction as Tx } from 'ethereumjs-tx';
-import getAddressNonce from '../lib/getAddressNonce';
-import { EthServer } from './EthServer';
+import getAddressNonce from '../../lib/getAddressNonce';
+import { EthModel } from './EthModel';
 import dec from 'decimal.js';
 
-export class TransactionServer {
+export class TransactionModel {
   
   /**
    * 构建代币转移TxObj
@@ -14,10 +14,10 @@ export class TransactionServer {
    * @param {string} to
    * @param {(string| number)} [amount='all']
    * @returns
-   * @memberof TransactionServer
+   * @memberof TransactionModel
    */
   async buildTokenTransaction(contractAddress: string, from: string, to: string, amount: string| number = 'all') {
-    const tokenServer = new TokenServer(contractAddress);
+    const tokenServer = new TokenModel(contractAddress);
     await tokenServer.contractInit();
     let abiData: string;
     if(amount === 'all') {
@@ -43,10 +43,10 @@ export class TransactionServer {
    * @param {string} from
    * @param {string} to
    * @param {(string|number)} [amount='all']
-   * @memberof TransactionServer
+   * @memberof TransactionModel
    */
   async buildEthTransaction(from: string, to: string, amount: string|number = 'all') {
-    const ethServer = new EthServer;
+    const ethServer = new EthModel;
     let gasObj: {
       gasLimit: number;
       gasPrice: number;
@@ -80,7 +80,7 @@ export class TransactionServer {
    * @param {object} transaction
    * @param {string} privateKey
    * @returns
-   * @memberof TransactionServer
+   * @memberof TransactionModel
    */
   async signTransaction(transaction: object, privateKey: string) {
     Object.keys(transaction).map(key => {
@@ -100,7 +100,7 @@ export class TransactionServer {
    * 发送交易
    * @param {string} Tx
    * @returns
-   * @memberof TransactionServer
+   * @memberof TransactionModel
    */
   sendTransaction(Tx: string) {
     return web3.eth.sendSignedTransaction(Tx);

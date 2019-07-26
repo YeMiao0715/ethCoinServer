@@ -1,10 +1,10 @@
-import { RunLog } from '../database/entity/RunLog';
+import { SystemRunLog } from '../../database/entity/SystemRunLog';
 import { configure, getLogger } from 'log4js';
-import log4Config from '../config/LoggerConfig';
+import log4Config from '../../config/LoggerConfig';
 import { getRepository } from 'typeorm';
 configure(log4Config);
 
-export class LogModel {
+export class SystemRunLogModel {
 
   static TYPE_INFO: number = 0;
   static TYPE_ERROR: number = 1;
@@ -22,12 +22,12 @@ export class LogModel {
    * @memberof LogModel
    */
   static async info(logs: string, scene: number, extend: object = {}) {
-    const log = new RunLog;
+    const log = new SystemRunLog;
     log.log = logs;
     log.scene = scene;
-    log.type = LogModel.TYPE_INFO;
+    log.type = SystemRunLogModel.TYPE_INFO;
     log.extends = JSON.stringify(extend);
-    await getRepository(RunLog).save(log);
+    await getRepository(SystemRunLog).save(log);
     this.fileLogInfo(logs, extend);
     return true;
   }
@@ -40,12 +40,12 @@ export class LogModel {
    * @memberof LogModel
    */
   static async error(logs: string, scene: number, extend: object = {}) {
-    const log = new RunLog;
+    const log = new SystemRunLog;
     log.log = logs;
     log.scene = scene;
-    log.type = LogModel.TYPE_ERROR;
+    log.type = SystemRunLogModel.TYPE_ERROR;
     log.extends = JSON.stringify(extend);
-    await getRepository(RunLog).save(log);
+    await getRepository(SystemRunLog).save(log);
     this.fileLogError(logs, extend);
     return true;
   }

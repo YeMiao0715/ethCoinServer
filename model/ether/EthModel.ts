@@ -1,4 +1,4 @@
-import { web3 } from "../config/web3.config";
+import { web3 } from "../../config/web3.config";
 import dec from 'decimal.js';
 
 export interface GasObj {
@@ -10,15 +10,15 @@ export interface GasObj {
 /**
  * eth服务
  * @export
- * @class EthServer
+ * @class EthModel
  */
-export class EthServer {
+export class EthModel {
 
   /**
    * 获取eth 余额
    * @param {string} address
    * @returns
-   * @memberof EthServer
+   * @memberof EthModel
    */
   async getEthAmount(address: string) {
     const amount = await web3.eth.getBalance(address);
@@ -32,7 +32,7 @@ export class EthServer {
    * @param {string} to
    * @param {(number| string)} value
    * @returns
-   * @memberof EthServer
+   * @memberof EthModel
    */
   async calcEthGas(from: string, to: string, value: number| string) {
 

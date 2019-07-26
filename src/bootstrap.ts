@@ -1,8 +1,15 @@
-import { LogModel } from './../model/LogModel';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import router from './router';
+import { WebRunLogModel } from '../model/databaseModel/WebRunLogModel';
+
 const app = new Koa();
+
+app.context.return = function(message: string, data: object = {}) {
+  return {
+    message, data
+  }
+}
 
 /**
  * 检测安全组
@@ -29,7 +36,7 @@ function checkIp(ip: string) {
   return status;
 }
 
-
+app.use(bodyParser());
 
 app.use(async (ctx, next) => {
   // 安全组检测
@@ -37,14 +44,18 @@ app.use(async (ctx, next) => {
     ctx.throw(403, '权限不足');
   }
 
-  LogModel.info(`${ctx.method} ${ctx.url}`, LogModel.SCENE_HTTPS_INFO, ctx.query);
+  WebRunLogModel.info(ctx.method, ctx.url, ctx.request.body, ctx.ip);
   
   // 设置响应头
   ctx.set('Content-Type', 'application/json;charset: UTF-8');
   await next();
 });
 
-app.use(bodyParser());
+app.on('error', (error, ctx) => {
+  
+});
+
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 

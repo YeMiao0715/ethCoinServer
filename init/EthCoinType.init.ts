@@ -1,4 +1,4 @@
-import { EthCoinTypeModel } from "../model/EthCoinTypeModel";
+import { EthCoinTypeModel } from "../model/databaseModel/EthCoinTypeModel";
 import { db } from "../database/database";
 
 

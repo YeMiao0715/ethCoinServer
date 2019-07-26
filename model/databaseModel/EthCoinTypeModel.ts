@@ -1,6 +1,6 @@
-import { LogModel } from './LogModel';
+import { SystemRunLogModel } from './SystemRunLogModel';
 import { getRepository } from "typeorm";
-import { EthCoinType } from "../database/entity/EthCoinType";
+import { EthCoinType } from "../../database/entity/EthCoinType";
 
 export class EthCoinTypeModel {
 
@@ -12,11 +12,6 @@ export class EthCoinTypeModel {
   static STATE_OFF = false;
   static STATE_ON = true;
 
-
-  getRepository() {
-    return getRepository(EthCoinType);
-  }
-
   /**
    * 获取合约列表
    * @memberof EthCoinTypeModel
@@ -24,7 +19,7 @@ export class EthCoinTypeModel {
   async getContractList() {
     const list = await getRepository(EthCoinType)
       .createQueryBuilder('coinType')
-      .select(['coinType.contract_address'])
+      .select(['coinType.name','coinType.contract_address'])
       .where({
         is_contract: EthCoinTypeModel.IS_CONTRACT,
         state: EthCoinTypeModel.STATE_ON,
@@ -56,8 +51,6 @@ export class EthCoinTypeModel {
     ethCoinType.calc_gas_address = calcGasAddress;
     return await getRepository(EthCoinType).save(ethCoinType);
   }
-
-  
   
   /**
    * eth配置初始化
@@ -75,6 +68,49 @@ export class EthCoinTypeModel {
     ethCoinType.type = EthCoinTypeModel.ETH_TYPE;
     ethCoinType.state = EthCoinTypeModel.STATE_ON;
     return await getRepository(EthCoinType).save(ethCoinType);
+  }
+
+
+  /**
+   * 获取代币支持列表
+   * @returns
+   * @memberof EthCoinTypeModel
+   */
+  async getCoinSupportList() {
+    const getContractList = await this.getContractList();
+    return getContractList;
+  }
+
+
+  /**
+   * 检测合约名称和合约地址并返回代币对象
+   * @param {string} nameOrContractAddress
+   * @returns
+   * @memberof EthCoinTypeModel
+   */
+  async verifyCoinNameOrContractAddress(nameOrContractAddress: string) {
+    let status = false;
+    let contractObj: {
+      name: string;
+      contract_address: string;
+    };
+    const coinSupportList = await this.getCoinSupportList();
+    coinSupportList.map(coin => {
+      if(coin.name.toLowerCase() === nameOrContractAddress.toLocaleLowerCase()){
+        status = true;
+        contractObj = coin;
+      }
+
+      if(coin.contract_address.toLowerCase() === nameOrContractAddress.toLocaleLowerCase()){
+        status = true;
+      }
+    })
+
+    if(status) {
+      return contractObj;
+    }else{
+      return status;
+    }
   }
   
   /**
@@ -95,7 +131,7 @@ export class EthCoinTypeModel {
       }).getOne();
 
     if(find === undefined) {
-      LogModel.error(`合约地址${contract_address}不存在`, LogModel.SCENE_TOKEN_INFO);
+      SystemRunLogModel.error(`合约地址${contract_address}不存在`, SystemRunLogModel.SCENE_TOKEN_INFO);
       throw new Error(`合约地址${contract_address}不存在`);
     }else{
       let abi: any[];
@@ -103,14 +139,14 @@ export class EthCoinTypeModel {
       try {
         abi = JSON.parse(find.abi);  
       } catch (error) {
-        LogModel.error(`合约地址${contract_address}abi解析错误`, LogModel.SCENE_TOKEN_INFO);
+        SystemRunLogModel.error(`合约地址${contract_address}abi解析错误`, SystemRunLogModel.SCENE_TOKEN_INFO);
         throw new Error(`合约地址${contract_address}abi解析错误`);
       }
 
       if(find.calc_gas_address.includes('0x')){
         calcGasAddress = find.calc_gas_address;  
       }else{
-        LogModel.error(`合约地址${contract_address}的计算gas地址不存在`, LogModel.SCENE_TOKEN_INFO);
+        SystemRunLogModel.error(`合约地址${contract_address}的计算gas地址不存在`, SystemRunLogModel.SCENE_TOKEN_INFO);
         throw new Error(`合约地址${contract_address}的计算gas地址不存在`);
       }
       

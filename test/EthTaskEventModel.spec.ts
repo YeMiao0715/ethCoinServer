@@ -1,4 +1,4 @@
-import { EthTaskEventModel, EthEventParam, TokenEventParam } from '../model/EthTaskEventModel';
+import { EthTaskEventModel, EthEventParam, TokenEventParam } from '../model/databaseModel/EthTaskEventModel';
 import { db } from "../database/database";
 import { expect } from 'chai';
 
