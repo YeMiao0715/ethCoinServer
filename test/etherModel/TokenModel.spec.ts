@@ -1,7 +1,7 @@
-import { TokenModel } from './../../model/ether/TokenModel';
+import { TokenModel } from '../../src/model/ether/TokenModel';
 import { expect } from 'chai';
 
-import { db } from '../../database/database';
+import { db } from '../../src/database/database';
 
 
 describe('ether TokenModel test', () => {

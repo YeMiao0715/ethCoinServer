@@ -1,7 +1,7 @@
-import { WebRunLog } from './../../database/entity/WebRunLog';
+import { WebRunLog } from '../../database/entity/WebRunLog';
 import { getRepository } from 'typeorm';
 import { configure, getLogger } from 'log4js';
-import log4Config from '../../config/LoggerConfig';
+import log4Config from '../../../config/LoggerConfig';
 configure(log4Config);
 
 

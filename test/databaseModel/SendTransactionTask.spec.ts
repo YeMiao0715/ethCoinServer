@@ -1,5 +1,5 @@
 import { sendEthTransaction } from "../../task/SendTransactionTask";
-import { db } from "../../database/database";
+import { db } from "../../src/database/database";
 
 
 describe('SendTransactionTask test', () => {

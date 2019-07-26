@@ -1,5 +1,5 @@
-import { EthCoinTypeModel } from "../../model/databaseModel/EthCoinTypeModel";
-import { db } from "../../database/database";
+import { EthCoinTypeModel } from "../../src/model/databaseModel/EthCoinTypeModel";
+import { db } from "../../src/database/database";
 import { expect } from 'chai';
 
 

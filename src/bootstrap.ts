@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import router from './router';
-import { WebRunLogModel } from '../model/databaseModel/WebRunLogModel';
+import { WebRunLogModel } from './model/databaseModel/WebRunLogModel';
 
 const app = new Koa();
 

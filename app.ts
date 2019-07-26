@@ -1,7 +1,7 @@
-import { SystemRunLogModel } from './model/databaseModel/SystemRunLogModel';
+import { SystemRunLogModel } from './src/model/databaseModel/SystemRunLogModel';
 import app from './src/bootstrap';
 import dotenv from 'dotenv';
-import { db } from './database/database';
+import { db } from './src/database/database';
 
 dotenv.config();
 

@@ -1,6 +1,6 @@
 import { SystemRunLog } from '../../database/entity/SystemRunLog';
 import { configure, getLogger } from 'log4js';
-import log4Config from '../../config/LoggerConfig';
+import log4Config from '../../../config/LoggerConfig';
 import { getRepository } from 'typeorm';
 configure(log4Config);
 

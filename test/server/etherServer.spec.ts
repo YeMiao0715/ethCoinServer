@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { EtherServer } from './../../src/server/EtherServer';
-import { db } from '../../database/database';
+import { db } from '../../src/database/database';
 
 
 describe('etherServer test', () => {

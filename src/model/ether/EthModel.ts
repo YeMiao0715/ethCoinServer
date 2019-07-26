@@ -1,4 +1,4 @@
-import { web3 } from "../../config/web3.config";
+import { web3 } from "../../../config/web3.config";
 import dec from 'decimal.js';
 
 export interface GasObj {

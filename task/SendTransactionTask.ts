@@ -1,4 +1,4 @@
-import { TransactionServer } from "../model/ether/TransactionModel";
+import { TransactionServer } from "../src/model/ether/TransactionModel";
 
 export const sendTokenTransaction = async function (contractAddress: string, from: string, to: string, amount: string| number = 'all') {
   const transaction = new TransactionServer;

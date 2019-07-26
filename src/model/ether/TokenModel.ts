@@ -1,5 +1,5 @@
 import Contract from "web3/eth/contract";
-import { web3 } from "../../config/web3.config";
+import { web3 } from "../../../config/web3.config";
 import { EthCoinTypeModel } from "../databaseModel/EthCoinTypeModel";
 import dec from 'decimal.js';
 

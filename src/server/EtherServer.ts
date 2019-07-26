@@ -1,6 +1,6 @@
-import { TokenModel } from './../../model/ether/TokenModel';
-import { EthCoinTypeModel } from './../../model/databaseModel/EthCoinTypeModel';
-import { EthModel } from "../../model/ether/EthModel";
+import { TokenModel } from '../model/ether/TokenModel';
+import { EthCoinTypeModel } from '../model/databaseModel/EthCoinTypeModel';
+import { EthModel } from "../model/ether/EthModel";
 
 export class EtherServer {
 

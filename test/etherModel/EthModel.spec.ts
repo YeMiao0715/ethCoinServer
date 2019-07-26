@@ -1,5 +1,5 @@
-import { EthModel } from '../../model/ether/EthModel';
-import { db } from "../../database/database";
+import { EthModel } from '../../src/model/ether/EthModel';
+import { db } from "../../src/database/database";
 import { expect } from 'chai';
 
 describe('ether EthModel test', () => {

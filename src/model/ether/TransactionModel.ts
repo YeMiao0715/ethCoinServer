@@ -1,5 +1,5 @@
 import { TokenModel } from './TokenModel';
-import { web3 } from '../../config/web3.config';
+import { web3 } from '../../../config/web3.config';
 import { Transaction as Tx } from 'ethereumjs-tx';
 import getAddressNonce from '../../lib/getAddressNonce';
 import { EthModel } from './EthModel';
