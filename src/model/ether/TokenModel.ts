@@ -2,6 +2,7 @@ import Contract from "web3/eth/contract";
 import { web3 } from "../../../config/web3.config";
 import { EthCoinTypeModel } from "../databaseModel/EthCoinTypeModel";
 import dec from 'decimal.js';
+import { getGasPrice } from "../../lib/utils";
 
 /**
  * 代币服务
@@ -70,7 +71,7 @@ export class TokenModel {
    * @memberof TokenModel
    */
   async calcTokenGas(from: string, to: string, tokenAmount: string|number) {
-    const gasPrice = await web3.eth.getGasPrice();
+    const gasPrice = await getGasPrice();
     tokenAmount = new dec(tokenAmount).mul(10 ** this.contractDecimal).toString();
     const abiData = await this.buildTransactionAbiData(to, tokenAmount);
     const gasLimit = await web3.eth.estimateGas({

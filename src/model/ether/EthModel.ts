@@ -1,5 +1,6 @@
 import { web3 } from "../../../config/web3.config";
 import dec from 'decimal.js';
+import { getGasPrice } from "../../lib/utils";
 
 export interface GasObj {
   gasLimit: number,
@@ -36,7 +37,7 @@ export class EthModel {
    */
   async calcEthGas(from: string, to: string, value: number| string) {
 
-    const gasPrice = await web3.eth.getGasPrice();
+    const gasPrice = await getGasPrice();
     const gasLimit = await web3.eth.estimateGas({
       from,
       to,

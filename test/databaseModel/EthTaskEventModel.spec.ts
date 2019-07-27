@@ -1,5 +1,5 @@
-import { EthTaskEventModel, EthEventParam, TokenEventParam } from '../src/model/databaseModel/EthTaskEventModel';
-import { db } from "../src/database/database";
+import { EthTaskEventModel, EthEventParam, TokenEventParam } from '../../src/model/databaseModel/EthTaskEventModel';
+import { db } from "../../src/database/database";
 import { expect } from 'chai';
 
 describe('EthTaskEventModel', () => {
