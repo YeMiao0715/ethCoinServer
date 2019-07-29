@@ -42,6 +42,8 @@
    },
    "scripts": {
       "start": "ts-node app.ts",
+      "queue": "ts-node ./src/queue/sendTransactionQueue.ts",
+      "coinTypeInit": "ts-node ./src/init/EthCoinType.init.ts",
       "dev": "nodemon app.ts",
       "test": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/*.spec.ts --timeout 50000",
       "nyc": "nyc --reporter=text yarn test"

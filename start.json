@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "name": "mainServer",
+      "script": "app.ts"
+    },
+    {
+      "name": "sendTransactionQueue",
+      "script": "./src/queue/sendTransactionQueue.ts"
+    }
+  ]
+}
