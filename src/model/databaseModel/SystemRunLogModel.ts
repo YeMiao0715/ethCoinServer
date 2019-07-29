@@ -9,11 +9,17 @@ export class SystemRunLogModel {
   static TYPE_INFO: number = 0;
   static TYPE_ERROR: number = 1;
 
+  // 系统日志
   static SCENE_SYSTEM_INFO: number = 0;
+  // eth日志
   static SCENE_ETH_INFO: number = 1;
+  // 代币日志
   static SCENE_TOKEN_INFO: number = 2;
-  static SCENE_HTTPS_INFO: number = 3;
-  
+  // 网络请求日志
+  static SCENE_HTTPREQUEST_INFO: number = 3;
+  // 分发交易日志
+  static SCENE_SENDTRANSACTION_EVENT: number = 4;
+
   /**
    * 添加普通日志
    * @param {string} logs

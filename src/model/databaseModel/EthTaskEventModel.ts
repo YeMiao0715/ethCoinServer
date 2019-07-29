@@ -20,6 +20,8 @@ export interface UpdataStateParam {
   state_message?: string;
   callback_state?: number;
   callback_state_message?: string;
+  hash?: string;
+  extends?: object;
 }
 
 export class EthTaskEventModel {
@@ -36,6 +38,7 @@ export class EthTaskEventModel {
 
   static STATE_UNFINISHED = 1;
   static STATE_FINISHE = 2;
+  static STATE_ERROR = 3;
 
   static CALLBACK_STATE_UNFINISHED = 0;
   static CALLBACK_STATE_SUCCESS = 1;
@@ -78,12 +81,35 @@ export class EthTaskEventModel {
     return await getRepository(EthTaskEvent).save(ethTaskEvent);
   }
 
+
+  /**
+   * 更新数据状态
+   * @param {number} id
+   * @param {UpdataStateParam} updataStateParam
+   * @returns
+   * @memberof EthTaskEventModel
+   */
   async updateEventState(id: number, updataStateParam: UpdataStateParam) {
     const find = await getRepository(EthTaskEvent).findOne(id);
     Object.keys(updataStateParam).map(keys => {
-      find[keys] = updataStateParam[keys];
+      if(['extends'].includes(keys)) {
+        find[keys] = JSON.stringify(updataStateParam[keys]);
+      }else{
+        find[keys] = updataStateParam[keys];
+      }
     })
     return await getRepository(EthTaskEvent).save(find);
+  }
+
+
+  async getOne(id: number) {
+    const find = await getRepository(EthTaskEvent).findOne(id);
+    Object.keys(find).map(keys => {
+      if(['event_param', 'extends'].includes(keys) && find[keys] !== null) {
+        find[keys] = JSON.parse(find[keys]);
+      }
+    })
+    return find;
   }
   
 }

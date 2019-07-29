@@ -4,7 +4,7 @@ import { getGasPrice } from "../../lib/utils";
 
 export interface GasObj {
   gasLimit: number,
-  gasPrice: number,
+  gasPrice: number| string,
   gasToEth: string
 }
 

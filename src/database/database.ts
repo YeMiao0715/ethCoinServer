@@ -1,3 +1,9 @@
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-export const db = createConnection;
+import connectionOption from '../../config/databaseConfig';
+
+export const db = async function() {
+  return await createConnection(connectionOption as any).then(connect => {
+    return connect;
+  })
+}

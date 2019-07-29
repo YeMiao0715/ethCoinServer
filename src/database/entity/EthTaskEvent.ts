@@ -34,6 +34,14 @@ export class EthTaskEvent {
   state: number;
 
   @Column({
+    length: 100,
+    nullable: true,
+    default: null
+  })
+  hash: string;
+
+  @Column({
+    type: 'text',
     comment: '状态运行信息或错误信息',
     nullable: true,
     default: null
@@ -47,6 +55,7 @@ export class EthTaskEvent {
   callback_state: number;
 
   @Column({
+    type: 'text',
     comment: '回调状态信息或错误信息',
     nullable: true,
     default: null

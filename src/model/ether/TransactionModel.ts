@@ -6,7 +6,7 @@ import { EthModel } from './EthModel';
 import dec from 'decimal.js';
 
 export class TransactionModel {
-  
+
   /**
    * 构建代币转移TxObj
    * @param {string} contractAddress
@@ -16,11 +16,12 @@ export class TransactionModel {
    * @returns
    * @memberof TransactionModel
    */
-  async buildTokenTransaction(contractAddress: string, from: string, to: string, amount: string| number = 'all') {
+  async buildTokenTransaction(contractAddress: string, from: string, to: string, amount: string | number = 'all') {
     const tokenServer = new TokenModel(contractAddress);
     await tokenServer.contractInit();
     let abiData: string;
-    if(amount === 'all') {
+    
+    if (amount === 'all') {
       amount = await tokenServer.getTokenAmount(from);
       abiData = await tokenServer.buildTransactionAbiData(to, amount);
     }else{
@@ -31,6 +32,8 @@ export class TransactionModel {
     const nonce = await this.getAddressNonce(from);
 
     return {
+      from, 
+      to: contractAddress,
       nonce,
       gasPrice: gasObj.gasPrice,
       gasLimit: gasObj.gasLimit,
@@ -45,25 +48,30 @@ export class TransactionModel {
    * @param {(string|number)} [amount='all']
    * @memberof TransactionModel
    */
-  async buildEthTransaction(from: string, to: string, amount: string|number = 'all') {
+  async buildEthTransaction(from: string, to: string, amount: string | number = 'all') {
     const ethServer = new EthModel;
     let gasObj: {
       gasLimit: number;
-      gasPrice: number;
+      gasPrice: number | string;
       gasToEth: string;
     };
 
-    if(amount === 'all') {
+    if (amount === 'all') {
       amount = await ethServer.getEthAmount(from);
+      if(new dec(amount).eq(0)) {
+        throw new Error('该地址eth余额为0');
+      }
       gasObj = await ethServer.calcEthGas(from, to, amount);
       amount = new dec(amount).sub(gasObj.gasToEth).toString();
-    }else{
+    } else {
       gasObj = await ethServer.calcEthGas(from, to, amount);
     }
-    
+
     const nonce = await this.getAddressNonce(from);
-    
+
     return {
+      from, 
+      to,
       nonce,
       gasPrice: gasObj.gasPrice,
       gasLimit: gasObj.gasLimit,
@@ -84,10 +92,11 @@ export class TransactionModel {
    */
   async signTransaction(transaction: object, privateKey: string) {
     Object.keys(transaction).map(key => {
-      if(['to','data'].includes(key) === false) {
+      if (['to', 'data'].includes(key) === false) {
         transaction[key] = web3.utils.toHex(transaction[key]);
       }
     });
+    console.log(transaction);
     const bufferKey = Buffer.from(privateKey.replace('0x', ''), 'hex');
     const tx = new Tx(transaction);
     tx.sign(bufferKey);

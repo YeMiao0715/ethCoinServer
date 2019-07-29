@@ -55,10 +55,10 @@ export class TokenModel {
    * @returns
    * @memberof TokenModel
    */
-  async buildTransactionAbiData(to: string, tokenAmount: string|number) {
+  async buildTransactionAbiData(to: string, tokenAmount: string | number) {
     tokenAmount = new dec(tokenAmount).mul(10 ** this.contractDecimal).toString();
     const abiData = await this.contract.methods.transfer(to, tokenAmount).encodeABI();
-    return  abiData;
+    return abiData;
   }
 
 
@@ -70,12 +70,12 @@ export class TokenModel {
    * @returns
    * @memberof TokenModel
    */
-  async calcTokenGas(from: string, to: string, tokenAmount: string|number) {
+  async calcTokenGas(from: string, to: string, tokenAmount: string | number) {
     const gasPrice = await getGasPrice();
     tokenAmount = new dec(tokenAmount).mul(10 ** this.contractDecimal).toString();
     const abiData = await this.buildTransactionAbiData(to, tokenAmount);
     const gasLimit = await web3.eth.estimateGas({
-      from,to,data: abiData, gasPrice
+      from: this.contractCalcGasAddress, to: this.contractAddress, data: abiData, gasPrice
     });
 
     return {

@@ -1,6 +1,8 @@
+import { TransactionModel } from './../model/ether/TransactionModel';
 import { TokenModel } from '../model/ether/TokenModel';
 import { EthCoinTypeModel } from '../model/databaseModel/EthCoinTypeModel';
 import { EthModel, GasObj } from "../model/ether/EthModel";
+import { EthTaskEventModel } from '../model/databaseModel/EthTaskEventModel';
 
 export class EtherServer {
 
@@ -16,7 +18,7 @@ export class EtherServer {
    */
   async getAccountAmount(address: string, coinName: string = 'all') {
     let amountObj = [];
-    switch(coinName) {
+    switch (coinName) {
       case 'eth':
         amountObj.push({
           name: 'eth',
@@ -24,7 +26,7 @@ export class EtherServer {
           amount: await this.ethModel.getEthAmount(address)
         });
         break;
-      case 'all': 
+      case 'all':
         amountObj.push({
           name: 'eth',
           contractAddress: null,
@@ -40,10 +42,10 @@ export class EtherServer {
             amount: await tokenModel.getTokenAmount(address)
           });
         }
-        break;        
-      default: 
+        break;
+      default:
         const contractObj = await this.ethCoinTypeModel.verifyCoinNameOrContractAddress(coinName);
-        if(contractObj !== false){
+        if (contractObj !== false) {
           const tokenModel = new TokenModel(contractObj.contract_address);
           await tokenModel.contractInit();
           amountObj.push({
@@ -51,7 +53,7 @@ export class EtherServer {
             contractAddress: contractObj.contract_address,
             amount: await tokenModel.getTokenAmount(address)
           });
-        }else{
+        } else {
           throw new Error(coinName + '币种不支持');
         }
         break;
@@ -68,16 +70,51 @@ export class EtherServer {
    * @returns
    * @memberof EtherServer
    */
-  async calcGasToEthAmount(from: string, to: string, contractAddress: string| undefined) {
+  async calcGasToEthAmount(from: string, to: string, contractAddress: string | undefined) {
     let gasObj: GasObj;
-    if(contractAddress !== undefined) {
+    if (contractAddress !== undefined) {
       const tokenModel = new TokenModel(contractAddress);
       await tokenModel.contractInit();
       gasObj = await tokenModel.calcTokenGas(from, to, 0);
-    }else{
+    } else {
       gasObj = await this.ethModel.calcEthGas(from, to, 0);
     }
     return gasObj;
+  }
+
+
+  /**
+   * 构建发送对象
+   * @param {string} from
+   * @param {string} to
+   * @param {(string | number)} value
+   * @param {(string | undefined)} contractAddress
+   * @returns
+   * @memberof EtherServer
+   */
+  async bulidSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
+    const transactionModel = new TransactionModel;
+    const ethTaskEventModel = new EthTaskEventModel;
+    let buildSendObject: object;
+    if (contractAddress !== undefined) {
+      buildSendObject = await transactionModel.buildTokenTransaction(contractAddress, from, to, value);
+      const eventObj = await ethTaskEventModel.addSendTokenEventObj({
+        contract: contractAddress,
+        from,
+        to,
+        value
+      })
+      buildSendObject['id'] = eventObj.id;
+    } else {
+      buildSendObject = await transactionModel.buildEthTransaction(from, to, value);
+      const eventObj = await ethTaskEventModel.addSendEthEventObj({
+        from,
+        to,
+        value
+      })
+      buildSendObject['id'] = eventObj.id;
+    }
+    return buildSendObject;
   }
 
 }
