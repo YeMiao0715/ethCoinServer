@@ -93,7 +93,6 @@ export class TransactionModel {
         transaction[key] = web3.utils.toHex(transaction[key]);
       }
     });
-    console.log(transaction);
     const bufferKey = Buffer.from(privateKey.replace('0x', ''), 'hex');
     const tx = new Tx(transaction);
     tx.sign(bufferKey);

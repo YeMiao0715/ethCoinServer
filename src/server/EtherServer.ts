@@ -71,7 +71,7 @@ export class EtherServer {
    * @returns
    * @memberof EtherServer
    */
-  async calcGasToEthAmount(from: string, to: string, contractAddress: string | undefined) {
+  async calcGasToEthAmount(from: string, to: string, contractAddress: string | undefined = undefined) {
     let gasObj: GasObj;
     if (contractAddress !== undefined) {
       const tokenModel = new TokenModel(contractAddress);
@@ -131,6 +131,31 @@ export class EtherServer {
     return data;
   }
 
+  /**
+   * 获取该地址最多可发某代币送数量
+   * @param {string} from
+   * @param {string} to
+   * @param {(string | undefined)} contractAddress
+   * @returns
+   * @memberof EtherServer
+   */
+  async getMaxSendAmount(from: string, to: string, contractAddress: string = null) {
+    let maxSendAmount: string;
+    let coinType: string;
+    if (contractAddress === null) {
+      coinType = 'eth';
+      maxSendAmount = await this.ethModel.calcMaxSendEthAmount(from, to);
+    } else {
+      const tokenModel = new TokenModel(contractAddress);
+      await tokenModel.contractInit();
+      coinType = tokenModel.getContractName();
+      maxSendAmount = await tokenModel.getTokenAmount(from);
+    }
+    return {
+      coinType,
+      maxSendAmount
+    };
+  }
 
   /**
    * 判断地址手续费是否足够

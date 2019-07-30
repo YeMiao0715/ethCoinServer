@@ -51,4 +51,18 @@ export class EthModel {
     }
   }
   
+
+  /**
+   * 计算最多可发送eth数量
+   * @param {string} from
+   * @param {string} to
+   * @returns
+   * @memberof EthModel
+   */
+  async calcMaxSendEthAmount(from: string, to: string) {
+    const gasObj = await this.calcEthGas(from, to, 0);
+    const ethAmount = await this.getEthAmount(from);
+    return new dec(ethAmount).mul(gasObj.gasToEth).toString();
+  }
+  
 }
