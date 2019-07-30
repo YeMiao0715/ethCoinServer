@@ -58,9 +58,6 @@ export class TransactionModel {
 
     if (amount === 'all') {
       amount = await ethServer.getEthAmount(from);
-      if(new dec(amount).eq(0)) {
-        throw new Error('该地址eth余额为0');
-      }
       gasObj = await ethServer.calcEthGas(from, to, amount);
       amount = new dec(amount).sub(gasObj.gasToEth).toString();
     } else {

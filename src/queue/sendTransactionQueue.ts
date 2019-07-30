@@ -8,19 +8,6 @@ dotenv.config({
   path: `${__dirname}/../../.env`
 });
 
-export interface SendEthTransactionOption {
-  from: string;
-  to: string;
-  value: string| number
-}
-
-export interface SendTokenTransactionOption {
-  from: string;
-  to: string;
-  value: string| number,
-  contractAddress: string
-}
-
 db().then(connect => {
   const server = net.createServer((socket) => {
     socket.on('data', data => {
@@ -33,12 +20,13 @@ db().then(connect => {
   })
 
   server.listen(process.env.QUEUE_PORT, () => {
-    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SYSTEM_INFO, server.address());
+    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, server.address());
   })
 });
 
 async function handleData(data) {
   data = JSON.parse(data);
+  SystemRunLogModel.info('接收到数据', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, data);
   let orderId = data.id;
   delete data.id;
   let privateKey = data.privateKey;
@@ -47,15 +35,22 @@ async function handleData(data) {
   const ethTaskEventModel = new EthTaskEventModel;
   const TxData = await transactionModel.signTransaction(data, privateKey);
 
+  
   transactionModel.sendTransaction(TxData)
     .on('transactionHash', (hash) => {
-      console.log(hash);
+      SystemRunLogModel.info('hash 打包', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, {
+        id: orderId,
+        hash: hash
+      });
       ethTaskEventModel.updateEventState(orderId, {
         hash
       });
     })
     .on('receipt', (receipt) => {
-      console.log(receipt);
+      SystemRunLogModel.info('交易完成', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, {
+        id: orderId,
+        receipt
+      });
       ethTaskEventModel.updateEventState(orderId, {
         state: EthTaskEventModel.STATE_FINISHE,
         state_message: '成功',
@@ -63,12 +58,15 @@ async function handleData(data) {
       });
     })
     .on('error', (error) => {
+      SystemRunLogModel.info('交易失败', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, {
+        id: orderId,
+        error: error.message
+      });
       ethTaskEventModel.updateEventState(orderId, {
         state: EthTaskEventModel.STATE_ERROR,
         state_message: error.message
       });
     });
-
 }
 
 

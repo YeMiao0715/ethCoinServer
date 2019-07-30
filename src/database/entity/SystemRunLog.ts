@@ -16,10 +16,10 @@ export class SystemRunLog {
   })
   scene: number;
 
-  @Column()
+  @Column('text')
   log: string;
 
-  @Column()
+  @Column('text')
   extends: string;
 
   @CreateDateColumn()

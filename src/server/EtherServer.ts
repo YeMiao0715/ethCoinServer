@@ -96,7 +96,8 @@ export class EtherServer {
   async bulidSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
     const transactionModel = new TransactionModel;
     const ethTaskEventModel = new EthTaskEventModel;
-    let buildSendObject;
+    let buildSendObject: any;
+    let orderId: number;
     if (contractAddress !== undefined) {
       buildSendObject = await transactionModel.buildTokenTransaction(contractAddress, from, to, value);
       await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
@@ -107,18 +108,27 @@ export class EtherServer {
         to,
         value
       })
-      buildSendObject['id'] = eventObj.id;
+      orderId = eventObj.id
     } else {
       buildSendObject = await transactionModel.buildEthTransaction(from, to, value);
       await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
+      await this.validatorAddressEthAmount(from, value, buildSendObject.gasPrice, buildSendObject.gasLimit);
       const eventObj = await ethTaskEventModel.addSendEthEventObj({
         from,
         to,
         value
       })
-      buildSendObject['id'] = eventObj.id;
+      orderId = eventObj.id
     }
-    return buildSendObject;
+
+    let data: object = {
+      id: orderId
+    }
+    Object.keys(buildSendObject).map(key => {
+      data[key] = buildSendObject[key];
+    })
+
+    return data;
   }
 
 
@@ -131,8 +141,32 @@ export class EtherServer {
    */
   async validatorAddressGas(from: string, gasPrice: string, gasLimit: string) {
     const eth = await web3.eth.getBalance(from);
-    if (new dec(eth).sub(new dec(gasPrice).mul(gasLimit).toString()).lt(0)) {
+    const gas = new dec(gasPrice).mul(gasLimit).toString();
+    if (new dec(eth).sub(gas).lt(0)) {
       throw new Error('eth手续费不足');
+    }
+    return gas;
+  }
+
+
+  /**
+   * 判断eth数量是否足够
+   * @param {string} from
+   * @param {(string | number)} amount
+   * @memberof EtherServer
+   */
+  async validatorAddressEthAmount(from: string, amount: string | number, gasPrice: string, gasLimit: string) {
+    const eth = await web3.eth.getBalance(from);
+    const sendAmount = web3.utils.toWei(amount.toString(), 'ether');
+    const gas = await this.validatorAddressGas(from, gasPrice, gasLimit);
+
+    if (new dec(eth).lt(sendAmount)) {
+      throw new Error('eth数量不足');
+    }
+    const maxSendAmount = new dec(eth).sub(gas)
+
+    if (maxSendAmount.lt(sendAmount)) {
+      throw new Error('最多可转移 ' + web3.utils.fromWei(maxSendAmount.toString(), 'ether') + ' eth');
     }
   }
 
@@ -148,7 +182,7 @@ export class EtherServer {
     const tokenModel = new TokenModel(contractAddress);
     await tokenModel.contractInit();
     const tokenAmount = await tokenModel.getTokenAmount(from);
-    if(new dec(tokenAmount).lt(amount.toString())) {
+    if (new dec(tokenAmount).lt(amount.toString())) {
       throw new Error(`${tokenModel.getContractName()} 数量不足`);
     }
   }
