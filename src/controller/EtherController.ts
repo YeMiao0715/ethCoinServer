@@ -13,7 +13,7 @@ router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
   let coin_name = ctx.params.coin_name;
   let address = ctx.params.address;
   try {
-    address = web3.utils.checkAddressChecksum(web3.utils.toChecksumAddress(address));
+    address = checkAddress(address);
   } catch (error) {
     ctx.throw(400, '地址解析错误')
   }
@@ -22,7 +22,9 @@ router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
 
   try {
     const accountList = await etherServer.getAccountAmount(address, coin_name);
-    ctx.body = ctx.return('ok', accountList);
+    ctx.body = ctx.return('ok', {
+      accountList
+    });
   } catch (error) {
     ctx.throw(400, error.message);
   }

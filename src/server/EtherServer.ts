@@ -101,7 +101,9 @@ export class EtherServer {
     if (contractAddress !== undefined) {
       buildSendObject = await transactionModel.buildTokenTransaction(contractAddress, from, to, value);
       await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
-      await this.validatorAddressTokenAmount(from, contractAddress, value);
+      if(value !== 'all') {
+        await this.validatorAddressTokenAmount(from, contractAddress, value);
+      }
       const eventObj = await ethTaskEventModel.addSendTokenEventObj({
         contract: contractAddress,
         from,
@@ -112,7 +114,9 @@ export class EtherServer {
     } else {
       buildSendObject = await transactionModel.buildEthTransaction(from, to, value);
       await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
-      await this.validatorAddressEthAmount(from, value, buildSendObject.gasPrice, buildSendObject.gasLimit);
+      if(value !== 'all') {
+        await this.validatorAddressEthAmount(from, value, buildSendObject.gasPrice, buildSendObject.gasLimit);
+      }
       const eventObj = await ethTaskEventModel.addSendEthEventObj({
         from,
         to,
