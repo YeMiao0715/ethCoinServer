@@ -3,7 +3,8 @@ import { TokenModel } from '../model/ether/TokenModel';
 import { EthCoinTypeModel } from '../model/databaseModel/EthCoinTypeModel';
 import { EthModel, GasObj } from "../model/ether/EthModel";
 import { EthTaskEventModel } from '../model/databaseModel/EthTaskEventModel';
-
+import dec from 'decimal.js';
+import { web3 } from '../../config/web3.config';
 export class EtherServer {
 
   ethModel = new EthModel;
@@ -95,9 +96,11 @@ export class EtherServer {
   async bulidSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
     const transactionModel = new TransactionModel;
     const ethTaskEventModel = new EthTaskEventModel;
-    let buildSendObject: object;
+    let buildSendObject;
     if (contractAddress !== undefined) {
       buildSendObject = await transactionModel.buildTokenTransaction(contractAddress, from, to, value);
+      await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
+      await this.validatorAddressTokenAmount(from, contractAddress, value);
       const eventObj = await ethTaskEventModel.addSendTokenEventObj({
         contract: contractAddress,
         from,
@@ -107,6 +110,7 @@ export class EtherServer {
       buildSendObject['id'] = eventObj.id;
     } else {
       buildSendObject = await transactionModel.buildEthTransaction(from, to, value);
+      await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
       const eventObj = await ethTaskEventModel.addSendEthEventObj({
         from,
         to,
@@ -115,6 +119,38 @@ export class EtherServer {
       buildSendObject['id'] = eventObj.id;
     }
     return buildSendObject;
+  }
+
+
+  /**
+   * 判断地址手续费是否足够
+   * @param {string} from
+   * @param {string} gasPrice
+   * @param {string} gasLimit
+   * @memberof EtherServer
+   */
+  async validatorAddressGas(from: string, gasPrice: string, gasLimit: string) {
+    const eth = await web3.eth.getBalance(from);
+    if (new dec(eth).sub(new dec(gasPrice).mul(gasLimit).toString()).lt(0)) {
+      throw new Error('eth手续费不足');
+    }
+  }
+
+
+  /**
+   * 判断代币数量是否足够
+   * @param {string} from
+   * @param {string} contractAddress
+   * @param {(string | number)} amount
+   * @memberof EtherServer
+   */
+  async validatorAddressTokenAmount(from: string, contractAddress: string, amount: string | number) {
+    const tokenModel = new TokenModel(contractAddress);
+    await tokenModel.contractInit();
+    const tokenAmount = await tokenModel.getTokenAmount(from);
+    if(new dec(tokenAmount).lt(amount.toString())) {
+      throw new Error(`${tokenModel.getContractName()} 数量不足`);
+    }
   }
 
 }

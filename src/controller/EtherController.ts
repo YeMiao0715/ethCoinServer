@@ -3,6 +3,7 @@ import Router from 'koa-router';
 import { web3 } from '../../config/web3.config';
 import { checkAddress } from '../lib/utils';
 import net from 'net';
+import { isNumeric } from 'validator';
 const router = new Router();
 
 /**
@@ -66,7 +67,9 @@ router.post('/calaGasAmount', async (ctx, next) => {
   }
 });
 
-
+/**
+ * 调起交易
+ */
 router.post('/sendTransaction', async (ctx, next) => {
   let post = ctx.request.body;
   let from = post.from;
@@ -74,6 +77,8 @@ router.post('/sendTransaction', async (ctx, next) => {
   let amount = post.amount;
   let contractAddress = post.contractAddress;
   let privateKey = post.privateKey;
+
+  console.log();
   try {
     from = checkAddress(from);
   } catch (error) {
@@ -94,9 +99,10 @@ router.post('/sendTransaction', async (ctx, next) => {
       ctx.throw(400, '合约地址解析错误');
     }
   }
-  if (amount !== 'all') {
-    if (parseInt(amount) === NaN) {
-      ctx.throw(400, '数量必须为数字');
+
+  if (! isNumeric(amount)) {
+    if (amount !== 'all') {
+      ctx.throw(400, '数量必须为数字或all');
     }
   }
 
@@ -104,16 +110,11 @@ router.post('/sendTransaction', async (ctx, next) => {
   try {
     const buildSendObject = await etherServer.bulidSendTransactionObject(from, to, amount, contractAddress);
     buildSendObject['privateKey'] = privateKey;
-    console.log(buildSendObject);
     net.connect(process.env.QUEUE_PORT).write(JSON.stringify(buildSendObject));
     ctx.body = ctx.return('ok', buildSendObject);
   } catch (error) {
-    console.log(error);
     ctx.throw(400, error.message);
   }
-
-
-
 })
 
 

@@ -4,14 +4,9 @@
 ```
   $ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/ install.sh | bash
   $ nvm install 10
-  $ npm i -g yarn
-  $ yarn 
-```
----
-## 全局依赖
-```
-  $ npm i -g pm2 typescript ts-node
+  $ npm i -g yarn pm2 typescript ts-node
   $ pm2 install typescript
+  $ yarn 
 ```
 ---
 ## eth配置节点等信息

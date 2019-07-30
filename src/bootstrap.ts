@@ -51,11 +51,6 @@ app.use(async (ctx, next) => {
   await next();
 });
 
-app.on('error', (error, ctx) => {
-  
-});
-
-
 app.use(router.routes());
 app.use(router.allowedMethods());
 

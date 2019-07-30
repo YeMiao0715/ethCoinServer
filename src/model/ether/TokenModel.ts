@@ -85,14 +85,14 @@ export class TokenModel {
     }
   }
 
-  async getTokenPastEvent(address) {
-
-    const events = await this.contract.getPastEvents('allEvents', {
-      fromBlock: 8103026,
-      toBlock: 'latest'
-    });
-
-    console.log(events);
+  /**
+   * 获取合约名称
+   * @returns
+   * @memberof TokenModel
+   */
+  getContractName() {
+    return this.contractName;
   }
+  
 }
 
