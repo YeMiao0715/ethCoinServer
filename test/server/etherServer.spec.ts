@@ -27,11 +27,19 @@ describe('etherServer test', () => {
   })
 
   it('获取最多可发送数量', async () => {
-    const maxAmount = await etherServer.getMaxSendAmount('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8', '0xdAC17F958D2ee523a2206206994597C13D831ec7');
-    expect(maxAmount).to.be.a('string');
-    const maxEthAmount = await etherServer.getMaxSendAmount('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8');
-    expect(maxEthAmount).to.be.a('string');
+    const maxAmountObj = await etherServer.getMaxSendAmount('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8', '0xdAC17F958D2ee523a2206206994597C13D831ec7');
+    expect(maxAmountObj).to.be.include.keys('coinType','maxSendAmount');
+    expect(maxAmountObj.coinType).to.be.a('string').eq('usdt');
+    expect(maxAmountObj.maxSendAmount).to.be.a('string');
+    const maxAmountOb = await etherServer.getMaxSendAmount('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8');
+    expect(maxAmountOb).to.be.include.keys('coinType','maxSendAmount');
+    expect(maxAmountOb.coinType).to.be.a('string').eq('eth');
+    expect(maxAmountOb.maxSendAmount).to.be.a('string');
   })
+
+  it('检验私钥', async () => {
+    await etherServer.validatorPrivateKey('3e4eab809406649d24fec3fff07f3bd96194d5ef5cce3e3f498432c2adda3073', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8');
+  });
 
   after(async () => {
     await connect.close();

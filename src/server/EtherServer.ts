@@ -5,6 +5,8 @@ import { EthModel, GasObj } from "../model/ether/EthModel";
 import { EthTaskEventModel } from '../model/databaseModel/EthTaskEventModel';
 import dec from 'decimal.js';
 import { web3 } from '../../config/web3.config';
+import * as wallet from 'ethereumjs-wallet';
+
 export class EtherServer {
 
   ethModel = new EthModel;
@@ -213,6 +215,13 @@ export class EtherServer {
     const tokenAmount = await tokenModel.getTokenAmount(from);
     if (new dec(tokenAmount).lt(amount.toString())) {
       throw new Error(`${tokenModel.getContractName()} 数量不足`);
+    }
+  }
+
+  async validatorPrivateKey(privateKey: string, address: string) {
+    const privateKeyObj = wallet.fromPrivateKey(Buffer.from(privateKey, 'hex'));
+    if('0x' + privateKeyObj.getAddress().toString('hex') !== address) {
+      throw new Error('私钥错误');
     }
   }
 

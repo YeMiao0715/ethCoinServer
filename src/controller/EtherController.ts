@@ -1,6 +1,5 @@
 import { EtherServer } from './../server/EtherServer';
 import Router from 'koa-router';
-import { web3 } from '../../config/web3.config';
 import { checkAddress } from '../lib/utils';
 import net from 'net';
 import { isNumeric } from 'validator';
@@ -130,6 +129,13 @@ router.post('/sendTransaction', async (ctx, next) => {
   }
 
   const etherServer = new EtherServer;
+
+  try {
+    await etherServer.validatorPrivateKey(privateKey, from);
+  } catch (error) {
+    ctx.throw(400, error.message);
+  }
+
   try {
     const buildSendObject = await etherServer.bulidSendTransactionObject(from, to, amount, contractAddress);
     buildSendObject['privateKey'] = privateKey;
