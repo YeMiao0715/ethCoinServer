@@ -8,3 +8,4 @@ temp/
 coverage/
 .nyc_output/
 logs/
+demo/

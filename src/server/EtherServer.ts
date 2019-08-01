@@ -226,9 +226,13 @@ export class EtherServer {
    * @memberof EtherServer
    */
   async validatorPrivateKey(privateKey: string, address: string) {
-    const privateKeyObj = wallet.fromPrivateKey(Buffer.from(privateKey, 'hex'));
-    const privateKeyToAddress = privateKeyObj.getChecksumAddressString();
-    if(privateKeyToAddress !== address) {
+    try {
+      const privateKeyObj = wallet.fromPrivateKey(Buffer.from(privateKey, 'hex'));  
+      const privateKeyToAddress = privateKeyObj.getChecksumAddressString();
+      if(privateKeyToAddress !== address) {
+        throw new Error('私钥错误');
+      }
+    } catch (error) {
       throw new Error('私钥错误');
     }
   }
