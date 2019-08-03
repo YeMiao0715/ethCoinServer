@@ -6,8 +6,8 @@ import { web3 } from "../../config/web3.config";
 import { Transaction } from "web3/eth/types";
 import { EthCoinTypeModel } from "../model/databaseModel/EthCoinTypeModel";
 import { AddressTransactionListModel } from '../model/databaseModel/AddressTransactionListModel';
-import dec from 'decimal.js';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
+import dec from 'decimal.js';
 
 const listenAddressModel = new ListenAddressModel;
 const blockRecord = new BlockRecordModel;
@@ -31,9 +31,11 @@ async function listenAddressInit() {
 async function loadTransactionListenAddressList() {
   const list = await listenAddressModel.getAddressList();
   list.map(value => {
-    transactionListenAddressList.add(value.address);
-    transactionListenAddressIndex.set(value.address, value.id);
-  });
+    if(!transactionListenAddressList.has(value.address)) {
+      transactionListenAddressList.add(value.address);
+      transactionListenAddressIndex.set(value.address, value.id);
+    }
+  })
 }
 
 /**
@@ -42,8 +44,10 @@ async function loadTransactionListenAddressList() {
 async function loadContractListenList() {
   const list = await ethCoinTypeModel.getContractList();
   list.map(value => {
-    contractListenList.add(value.contract_address);
-    contractListenIndex.set(value.contract_address, value.id);
+    if(!transactionListenAddressList.has(value.contract_address)) {
+      transactionListenAddressList.add(value.contract_address);
+      transactionListenAddressIndex.set(value.contract_address, value.id);
+    }
   })
 }
 
@@ -173,16 +177,17 @@ function sellp(time) {
   })
 }
 
+
 async function start() {
   await listenAddressInit();
   const lastBlockNum = await getLastBlockNum();
   const blockData = await web3.eth.getBlock(lastBlockNum, true);
   await SystemRunLogModel.info('处理区块 ' + lastBlockNum, SystemRunLogModel.SCENE_LIENT_INFO);
-  for (const transaction of blockData.transactions) {
-    await distributeTransaction(transaction)
-  }
+  blockData.transactions.map(transaction => {
+    distributeTransaction(transaction)
+  })
   await blockRecord.saveBlockRecord(lastBlockNum, blockData.transactions.length);
-  await start();
+  start();
 }
 
 async function one(blockNumber) {
@@ -194,8 +199,8 @@ async function one(blockNumber) {
   await blockRecord.saveBlockRecord(blockNumber, blockData.transactions.length);
 }
 
-db().then(async connect => {
-  await start();
+db().then(connect => {
+  start();
   // await one(8273143);
-  await connect.close();
+  // await connect.close();
 })
