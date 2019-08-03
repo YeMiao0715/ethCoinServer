@@ -44,9 +44,9 @@ async function loadTransactionListenAddressList() {
 async function loadContractListenList() {
   const list = await ethCoinTypeModel.getContractList();
   list.map(value => {
-    if(!transactionListenAddressList.has(value.contract_address)) {
-      transactionListenAddressList.add(value.contract_address);
-      transactionListenAddressIndex.set(value.contract_address, value.id);
+    if(!contractListenList.has(value.contract_address)) {
+      contractListenList.add(value.contract_address);
+      contractListenIndex.set(value.contract_address, value.id);
     }
   })
 }
@@ -187,11 +187,15 @@ async function start() {
     distributeTransaction(transaction)
   })
   await blockRecord.saveBlockRecord(lastBlockNum, blockData.transactions.length);
-  start();
+  // start();
 }
 
 async function one(blockNumber) {
   await listenAddressInit();
+  // console.log(transactionListenAddressList);
+  // console.log(transactionListenAddressIndex);
+  // console.log(contractListenList);
+  // console.log(contractListenIndex);
   const blockData = await web3.eth.getBlock(blockNumber, true);
   blockData.transactions.map(transaction => {
     distributeTransaction(transaction)
@@ -201,6 +205,5 @@ async function one(blockNumber) {
 
 db().then(connect => {
   start();
-  // await one(8273143);
-  // await connect.close();
+  // one(8270179);
 })
