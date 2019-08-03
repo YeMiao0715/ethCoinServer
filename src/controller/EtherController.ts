@@ -131,14 +131,13 @@ router.post('/sendTransaction', async (ctx, next) => {
   const etherServer = new EtherServer;
 
   try {
-    await etherServer.validatorPrivateKey(privateKey, from);
+    privateKey = await etherServer.validatorPrivateKey(privateKey, from);
   } catch (error) {
     ctx.throw(400, error.message);
   }
 
   try {
     const buildSendObject = await etherServer.bulidSendTransactionObject(from, to, amount, contractAddress);
-    buildSendObject['privateKey'] = privateKey;
     net.connect(process.env.QUEUE_PORT).write(JSON.stringify(buildSendObject));
     ctx.body = ctx.return('ok', buildSendObject);
   } catch (error) {

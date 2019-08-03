@@ -27,16 +27,6 @@ describe('ether TokenModel test', () => {
       expect(gasObj.gasLimit).to.be.a('number');
       expect(gasObj.gasToEth).to.be.a('string');
   });
-
-  // it('获取代币历史转账记录', async () => {
-  //   await db().then(async connect => {
-  //     const tokenModel = new tokenModel('0xdAC17F958D2ee523a2206206994597C13D831ec7');
-  //     await tokenModel.contractInit();
-  //     const evens = await tokenModel.getTokenPastEvent('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad');
-      
-  //     connect.close();
-  //   })
-  // });
   
   after(async function() {
     await connect.close();

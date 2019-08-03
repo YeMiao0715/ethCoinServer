@@ -7,7 +7,6 @@ describe('transactionModel test', () => {
   var connect;
   const transactionModel = new TransactionModel();
 
-
   before(async function() {
     connect = await db().then(connect => connect);
   });

@@ -13,8 +13,12 @@ export class BlockRecordModel {
     const find = await getRepository(BlockRecord)
       .createQueryBuilder('block')
       .select('block.block_number')
-      .orderBy('block.block_number')
+      .orderBy('block.block_number', 'DESC')
       .getOne();
+    
+    if(find === undefined) {
+      return false;
+    }
     return find.block_number;
   }
 
@@ -28,7 +32,7 @@ export class BlockRecordModel {
   async saveBlockRecord(blockNumber: number, transactionCount: number) {
     const blockRecord = new BlockRecord;
     blockRecord.block_number = blockNumber;
-    blockRecord.block_number = transactionCount;
+    blockRecord.transaction_count = transactionCount;
     return await getRepository(BlockRecord).save(blockRecord);
   }
 

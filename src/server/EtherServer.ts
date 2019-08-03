@@ -218,7 +218,6 @@ export class EtherServer {
     }
   }
 
-
   /**
    * 验证私钥是否正确
    * @param {string} privateKey
@@ -232,9 +231,47 @@ export class EtherServer {
       if(privateKeyToAddress !== address) {
         throw new Error('私钥错误');
       }
+      return privateKey;
     } catch (error) {
       throw new Error('私钥错误');
     }
+  }
+
+  /**
+   * 解析交易
+   * @param {string} transaction
+   * @returns
+   * @memberof EtherServer
+   */
+  async analysisTransaction(transaction: string) {
+    const receipt = await web3.eth.getTransactionReceipt(transaction);
+    let eventTransactions = [];
+    if(receipt.logs.length) {
+      receipt.logs.map(value => {
+        const from = web3.eth.abi.decodeParameter('address', value.topics[1]);
+        const to = web3.eth.abi.decodeParameter('address', value.topics[2]);
+        const amount = web3.eth.abi.decodeParameter('uint256', value.data);
+        eventTransactions.push({
+          blockNumber: value.blockNumber,
+          hash: value.transactionHash,
+          from,
+          to,
+          amount,
+          contract: value.address,
+        });
+      });
+    }else{
+      const receipt = await web3.eth.getTransaction(transaction);
+      eventTransactions.push({
+        blockNumber: receipt.blockNumber,
+        hash: receipt.hash,
+        from: receipt.from,
+        to: receipt.to,
+        amount: receipt.value,
+        contract: null,
+      });
+    }
+    return eventTransactions;
   }
 
 }
