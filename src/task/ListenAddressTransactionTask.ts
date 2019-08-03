@@ -91,6 +91,10 @@ async function distributeTransaction(transaction: Transaction) {
       if (transactionListenAddressList.has(log.to)) {
         // 合约接受记录
         await saveTokenTransaction(log, AddressTransactionListModel.TYPE_RECEIVE, log.to);
+
+        if(log.to === '') {
+          // TODO: 对某地址进行特殊操作
+        }
       }
     }
   }else{
@@ -187,7 +191,7 @@ async function start() {
     distributeTransaction(transaction)
   })
   await blockRecord.saveBlockRecord(lastBlockNum, blockData.transactions.length);
-  // start();
+  start();
 }
 
 async function one(blockNumber) {
@@ -205,5 +209,5 @@ async function one(blockNumber) {
 
 db().then(connect => {
   start();
-  // one(8270179);
+  // one(8276915);
 })

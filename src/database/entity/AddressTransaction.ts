@@ -20,12 +20,11 @@ export class AddressTransaction {
   })
   type: number;
 
+  @Index()
   @Column()
   block_number: string;
 
-  @Column({
-    unique: true
-  })
+  @Column()
   hash: string;
 
   @Column()

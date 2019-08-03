@@ -7,6 +7,10 @@
     {
       "name": "sendTransactionQueue",
       "script": "./src/queue/sendTransactionQueue.ts"
+    },
+    {
+      "name": "listenAddressTask",
+      "script": "./src/task/ListenAddressTransactionTask.ts"
     }
   ]
 }

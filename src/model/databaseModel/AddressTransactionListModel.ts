@@ -30,17 +30,27 @@ export class AddressTransactionListModel {
     to: string, 
     amount: string, 
     extend: object) {
-    const addressTransaction = new AddressTransaction;
-    addressTransaction.type = type;
-    addressTransaction.address_id = addressId;
-    addressTransaction.contract_id = contractId;
-    addressTransaction.block_number = blockNumber.toString();
-    addressTransaction.hash = hash;
-    addressTransaction.from = from;
-    addressTransaction.to = to;
-    addressTransaction.amount = amount;
-    addressTransaction.extends = JSON.stringify(extend);
-    return await getRepository(AddressTransaction).save(addressTransaction);
+    const find = await getRepository(AddressTransaction)
+      .createQueryBuilder('transaction')
+      .select(['transaction.id'])
+      .where({
+        address_id: addressId,
+        block_number: blockNumber,
+        hash
+      }).getOne();
+    if(!find){
+      const addressTransaction = new AddressTransaction;
+      addressTransaction.type = type;
+      addressTransaction.address_id = addressId;
+      addressTransaction.contract_id = contractId;
+      addressTransaction.block_number = blockNumber.toString();
+      addressTransaction.hash = hash;
+      addressTransaction.from = from;
+      addressTransaction.to = to;
+      addressTransaction.amount = amount;
+      addressTransaction.extends = JSON.stringify(extend);
+      return await getRepository(AddressTransaction).save(addressTransaction);
+    }
   }
 
 }
