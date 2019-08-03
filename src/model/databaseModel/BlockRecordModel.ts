@@ -30,12 +30,17 @@ export class BlockRecordModel {
    * @memberof BlockRecordModel
    */
   async saveBlockRecord(blockNumber: number, transactionCount: number) {
-    const blockRecord = new BlockRecord;
-    blockRecord.block_number = blockNumber;
-    blockRecord.transaction_count = transactionCount;
-    return await getRepository(BlockRecord).save(blockRecord);
+    const find = await getRepository(BlockRecord).findOne(blockNumber);
+    if(find) {
+      find.affert_num += 1;
+      return await getRepository(BlockRecord).save(find);
+    }else{
+      const blockRecord = new BlockRecord;
+      blockRecord.block_number = blockNumber;
+      blockRecord.transaction_count = transactionCount;
+      return await getRepository(BlockRecord).save(blockRecord);
+    }
   }
-
 
   /**
    * 捕获交易数量+1
@@ -47,20 +52,6 @@ export class BlockRecordModel {
   async captureInc(blockNumber: number, captureNum: number = 1) {
     const find = await getRepository(BlockRecord).findOne(blockNumber);
     find.capture_num += captureNum;
-    return await getRepository(BlockRecord).save(find);
-  }
-
-
-  /**
-   * 区块确认次数增加
-   * @param {number} blockNumber
-   * @param {number} [affertNum=1]
-   * @returns
-   * @memberof BlockRecordModel
-   */
-  async affertInc(blockNumber: number, affertNum: number = 1) {
-    const find = await getRepository(BlockRecord).findOne(blockNumber);
-    find.affert_num += affertNum;
     return await getRepository(BlockRecord).save(find);
   }
 

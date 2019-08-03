@@ -1,11 +1,19 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, CreateDateColumn, Index, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class AddressTransaction {
 
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Index()
+  @Column()
   address_id: number;
 
+  @Index()
+  @Column()
+  contract_id: number;
+  
   @Column({
     type: 'tinyint',
     comment: '1[接受],2[发送]'
@@ -13,13 +21,21 @@ export class AddressTransaction {
   type: number;
 
   @Column()
-  contract_address: string;
-
-  @Column()
   block_number: string;
 
-  @Column()
+  @Column({
+    unique: true
+  })
   hash: string;
+
+  @Column()
+  from: string;
+
+  @Column()
+  to: string;
+
+  @Column()
+  amount: string;
 
   @Column({
     type: 'text'

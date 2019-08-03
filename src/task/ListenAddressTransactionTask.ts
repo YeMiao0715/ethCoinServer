@@ -5,16 +5,20 @@ import { BlockRecordModel } from "../model/databaseModel/BlockRecordModel";
 import { web3 } from "../../config/web3.config";
 import { Transaction } from "web3/eth/types";
 import { EthCoinTypeModel } from "../model/databaseModel/EthCoinTypeModel";
+import { AddressTransactionListModel } from '../model/databaseModel/AddressTransactionListModel';
+import dec from 'decimal.js';
+import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
 
 const listenAddressModel = new ListenAddressModel;
 const blockRecord = new BlockRecordModel;
 const ethCoinTypeModel = new EthCoinTypeModel;
 const etherServer = new EtherServer;
-const a
+const addressTransactionListModel = new AddressTransactionListModel;
 
 const transactionListenAddressList = new Set();
 const transactionListenAddressIndex = new Map();
 const contractListenList = new Set();
+const contractListenIndex = new Map();
 
 async function listenAddressInit() {
   await loadTransactionListenAddressList();
@@ -39,6 +43,7 @@ async function loadContractListenList() {
   const list = await ethCoinTypeModel.getContractList();
   list.map(value => {
     contractListenList.add(value.contract_address);
+    contractListenIndex.set(value.contract_address, value.id);
   })
 }
 
@@ -50,12 +55,12 @@ async function getLastBlockNum() {
   let chainsLastNum = await web3.eth.getBlockNumber();
   let onBlockNum: number;
   const lastBlockNum = await blockRecord.getLastBlockNum();
-  if(!lastBlockNum) {
+  if (!lastBlockNum) {
     onBlockNum = chainsLastNum;
-  }else{
-    if(chainsLastNum > lastBlockNum + 4) {
+  } else {
+    if (chainsLastNum > lastBlockNum + 4) {
       onBlockNum = lastBlockNum + 1;
-    }else{
+    } else {
       await sellp(5000);
       await listenAddressInit();
       return await getLastBlockNum();
@@ -69,32 +74,90 @@ async function getLastBlockNum() {
  * @param {Transaction} transaction
  */
 async function distributeTransaction(transaction: Transaction) {
-  if(transactionListenAddressList.has(transaction.from)) {
-    // TODO: send记录
 
-  }
-
-  if(transactionListenAddressList.has(transaction.to)) {
-    // TODO: 接受记录
-  }
-
-  if(contractListenList.has(transaction.to)) {
-    // TODO: 分发合约
+  if (contractListenList.has(transaction.to)) {
+    // 分发合约
     const logs = await etherServer.analysisTransaction(transaction.hash)
-    logs.map(log => {
-      if(transactionListenAddressList.has(log.from)) {
-        // TODO: 合约send记录
+    for (const log of logs) {
+      if (transactionListenAddressList.has(log.from)) {
+        // 合约send记录
+        await saveTokenTransaction(log, AddressTransactionListModel.TYPE_SEND, log.from);
       }
-    
-      if(transactionListenAddressList.has(log.to)) {
-        // TODO: 合约接受记录
+
+      if (transactionListenAddressList.has(log.to)) {
+        // 合约接受记录
+        await saveTokenTransaction(log, AddressTransactionListModel.TYPE_RECEIVE, log.to);
       }
-    });
+    }
+  }else{
+    // 分发合约记录
+    if (transactionListenAddressList.has(transaction.from)) {
+      // send记录
+      await saveEthTransaction(transaction, AddressTransactionListModel.TYPE_SEND, transaction.from);
+    }
+  
+    if (transactionListenAddressList.has(transaction.to)) {
+      // 接受记录
+      await saveEthTransaction(transaction, AddressTransactionListModel.TYPE_RECEIVE, transaction.to);
+    }
   }
 }
 
-async function saveTransaction() {
+/**
+ * 保存eth交易消息
+ * @param {Transaction} transaction
+ * @param {number} type
+ * @param {string} eventAddress
+ */
+async function saveEthTransaction(transaction: Transaction, type: number, eventAddress: string) {
+  await SystemRunLogModel.info('处理hash ' + transaction.hash, SystemRunLogModel.SCENE_LIENT_INFO);
+  const addressId = transactionListenAddressIndex.get(eventAddress);
+  try {
+    await addressTransactionListModel.saveTransaction(
+      type,
+      addressId,
+      0,
+      transaction.blockNumber,
+      transaction.hash,
+      transaction.from,
+      transaction.to,
+      web3.utils.fromWei(transaction.value, 'ether'),
+      transaction
+    )
+    await listenAddressModel.updateBlockNumber(addressId, transaction.blockNumber, 1);  
+  } catch (error) {
+    console.log(error);
+  }
+}
 
+
+/**
+ * 保存token交易消息
+ * @param {*} transaction
+ * @param {number} type
+ * @param {string} eventAddress
+ */
+async function saveTokenTransaction(transaction: any, type: number, eventAddress: string) {
+  await SystemRunLogModel.info('处理hash ' + transaction.hash, SystemRunLogModel.SCENE_LIENT_INFO);
+  const addressId = transactionListenAddressIndex.get(eventAddress);
+  const contractId = contractListenIndex.get(transaction.contract);
+  const tokenInfo = await ethCoinTypeModel.getContractInfoOfId(contractId);
+  try {
+    await addressTransactionListModel.saveTransaction(
+      type,
+      addressId,
+      contractId,
+      transaction.blockNumber,
+      transaction.hash,
+      transaction.from,
+      transaction.to,
+      new dec(transaction.amount).div(10 ** tokenInfo.decimal).toString(),
+      transaction
+    )
+    await listenAddressModel.updateBlockNumber(addressId, transaction.blockNumber, 1);  
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 /**
@@ -112,18 +175,27 @@ function sellp(time) {
 
 async function start() {
   await listenAddressInit();
-  // console.log(addressList.has('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad'));
-  // console.log(addressIndex.get('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad'));
   const lastBlockNum = await getLastBlockNum();
   const blockData = await web3.eth.getBlock(lastBlockNum, true);
-  blockData.transactions.map(transaction => {
-    distributeTransaction(transaction)
-  })
+  await SystemRunLogModel.info('处理区块 ' + lastBlockNum, SystemRunLogModel.SCENE_LIENT_INFO);
+  for (const transaction of blockData.transactions) {
+    await distributeTransaction(transaction)
+  }
   await blockRecord.saveBlockRecord(lastBlockNum, blockData.transactions.length);
   await start();
 }
 
+async function one(blockNumber) {
+  await listenAddressInit();
+  const blockData = await web3.eth.getBlock(blockNumber, true);
+  blockData.transactions.map(transaction => {
+    distributeTransaction(transaction)
+  })
+  await blockRecord.saveBlockRecord(blockNumber, blockData.transactions.length);
+}
+
 db().then(async connect => {
   await start();
+  // await one(8273143);
   await connect.close();
 })

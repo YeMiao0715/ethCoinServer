@@ -19,7 +19,7 @@ export class EthCoinTypeModel {
   async getContractList() {
     const list = await getRepository(EthCoinType)
       .createQueryBuilder('coinType')
-      .select(['coinType.name','coinType.contract_address'])
+      .select(['coinType.name','coinType.contract_address','coinType.id'])
       .where({
         is_contract: EthCoinTypeModel.IS_CONTRACT,
         state: EthCoinTypeModel.STATE_ON,
@@ -157,5 +157,18 @@ export class EthCoinTypeModel {
         decimal: find.decimal
       };
     }
+  }
+
+
+  /**
+   * 获取合约信息通过id 查询
+   * @param {number} id
+   * @returns
+   * @memberof EthCoinTypeModel
+   */
+  async getContractInfoOfId(id: number) {
+    const find = await getRepository(EthCoinType)
+      .findOne(id);
+    return find;
   }
 }

@@ -11,14 +11,15 @@ export class SystemRunLogModel {
 
   // 系统日志
   static SCENE_SYSTEM_INFO: number = 0;
-  // eth日志
-  static SCENE_ETH_INFO: number = 1;
+  // 监听日志
+  static SCENE_LIENT_INFO: number = 1;
   // 代币日志
   static SCENE_TOKEN_INFO: number = 2;
   // 网络请求日志
   static SCENE_HTTPREQUEST_INFO: number = 3;
   // 分发交易日志
   static SCENE_SENDTRANSACTION_EVENT: number = 4;
+
 
   /**
    * 添加普通日志
