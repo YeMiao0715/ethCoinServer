@@ -8,6 +8,8 @@ dotenv.config({
   path: `${__dirname}/../../.env`
 });
 
+const port = process.env.SEND_QUEUE_PORT;
+
 db().then(connect => {
   const server = net.createServer((socket) => {
     socket.on('data', data => {
@@ -19,7 +21,7 @@ db().then(connect => {
     console.log(error);
   })
 
-  server.listen(process.env.QUEUE_PORT, () => {
+  server.listen(port, () => {
     SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, server.address());
   })
 });
