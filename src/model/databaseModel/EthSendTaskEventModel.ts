@@ -1,6 +1,6 @@
 import { EthCoinTypeModel } from './EthCoinTypeModel';
 import { getRepository, getManager } from "typeorm";
-import { EthTaskEvent } from "../../database/entity/EthTaskEvent";
+import { EthSendTaskEvent } from "../../database/entity/EthSendTaskEvent";
 
 export interface EthEventParam {
   from: string,
@@ -24,7 +24,7 @@ export interface UpdataStateParam {
   extends?: object;
 }
 
-export class EthTaskEventModel {
+export class EthSendTaskEventModel {
 
   static EVENT_TYPE_ETH = {
     type: 1,
@@ -35,6 +35,11 @@ export class EthTaskEventModel {
     type: 2,
     name: 'sendTokenTransaction'
   };
+
+  static EVENT_TYPE_TOPUP = {
+    type: 3,
+    name: 'topUpTransaction'
+  }
 
   static STATE_UNFINISHED = 1;
   static STATE_FINISHE = 2;
@@ -49,36 +54,36 @@ export class EthTaskEventModel {
    * 添加sendEthTransactionEvent
    * @param {EthEventParam} EventParam
    * @returns
-   * @memberof EthTaskEventModel
+   * @memberof EthSendTaskEventModel
    */
   async addSendEthEventObj(eventParam: EthEventParam) {
-    const ethTaskEvent = new EthTaskEvent;
-    ethTaskEvent.event_type = EthTaskEventModel.EVENT_TYPE_ETH.name;
-    ethTaskEvent.type = EthTaskEventModel.EVENT_TYPE_ETH.type;
-    ethTaskEvent.event_param = JSON.stringify(eventParam);
-    ethTaskEvent.state = EthTaskEventModel.STATE_UNFINISHED;
-    ethTaskEvent.coin_name = 'eth';
-    ethTaskEvent.callback_state = EthTaskEventModel.CALLBACK_STATE_UNFINISHED;
-    return await getRepository(EthTaskEvent).save(ethTaskEvent);
+    const ethSendTaskEvent = new EthSendTaskEvent;
+    ethSendTaskEvent.event_type = EthSendTaskEventModel.EVENT_TYPE_ETH.name;
+    ethSendTaskEvent.type = EthSendTaskEventModel.EVENT_TYPE_ETH.type;
+    ethSendTaskEvent.event_param = JSON.stringify(eventParam);
+    ethSendTaskEvent.state = EthSendTaskEventModel.STATE_UNFINISHED;
+    ethSendTaskEvent.coin_name = 'eth';
+    ethSendTaskEvent.callback_state = EthSendTaskEventModel.CALLBACK_STATE_UNFINISHED;
+    return await getRepository(EthSendTaskEvent).save(ethSendTaskEvent);
   }
 
   /**
    * 添加sendTokenTransactionEvent
    * @param {TokenEventParam} eventParam
    * @returns
-   * @memberof EthTaskEventModel
+   * @memberof EthSendTaskEventModel
    */
   async addSendTokenEventObj(eventParam: TokenEventParam) {
-    const ethTaskEvent = new EthTaskEvent;
-    ethTaskEvent.event_type = EthTaskEventModel.EVENT_TYPE_ETH.name;
-    ethTaskEvent.type = EthTaskEventModel.EVENT_TYPE_ETH.type;
-    ethTaskEvent.event_param = JSON.stringify(eventParam);
-    ethTaskEvent.state = EthTaskEventModel.STATE_UNFINISHED;
+    const ethSendTaskEvent = new EthSendTaskEvent;
+    ethSendTaskEvent.event_type = EthSendTaskEventModel.EVENT_TYPE_TOKEN.name;
+    ethSendTaskEvent.type = EthSendTaskEventModel.EVENT_TYPE_TOKEN.type;
+    ethSendTaskEvent.event_param = JSON.stringify(eventParam);
+    ethSendTaskEvent.state = EthSendTaskEventModel.STATE_UNFINISHED;
     const ethCoinTypeModel = new EthCoinTypeModel;
     const contractInfo = await ethCoinTypeModel.getContractInfo(eventParam.contract);
-    ethTaskEvent.coin_name = contractInfo.name;
-    ethTaskEvent.callback_state = EthTaskEventModel.CALLBACK_STATE_UNFINISHED;
-    return await getRepository(EthTaskEvent).save(ethTaskEvent);
+    ethSendTaskEvent.coin_name = contractInfo.name;
+    ethSendTaskEvent.callback_state = EthSendTaskEventModel.CALLBACK_STATE_UNFINISHED;
+    return await getRepository(EthSendTaskEvent).save(ethSendTaskEvent);
   }
 
 
@@ -87,10 +92,10 @@ export class EthTaskEventModel {
    * @param {number} id
    * @param {UpdataStateParam} updataStateParam
    * @returns
-   * @memberof EthTaskEventModel
+   * @memberof EthSendTaskEventModel
    */
   async updateEventState(id: number, updataStateParam: UpdataStateParam) {
-    const find = await getRepository(EthTaskEvent).findOne(id);
+    const find = await getRepository(EthSendTaskEvent).findOne(id);
     Object.keys(updataStateParam).map(keys => {
       if(['extends'].includes(keys)) {
         find[keys] = JSON.stringify(updataStateParam[keys]);
@@ -98,12 +103,12 @@ export class EthTaskEventModel {
         find[keys] = updataStateParam[keys];
       }
     })
-    return await getRepository(EthTaskEvent).save(find);
+    return await getRepository(EthSendTaskEvent).save(find);
   }
 
 
   async getOne(id: number) {
-    const find = await getRepository(EthTaskEvent).findOne(id);
+    const find = await getRepository(EthSendTaskEvent).findOne(id);
     Object.keys(find).map(keys => {
       if(['event_param', 'extends'].includes(keys) && find[keys] !== null) {
         find[keys] = JSON.parse(find[keys]);

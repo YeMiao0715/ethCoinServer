@@ -21,7 +21,7 @@ describe('ether TokenModel test', () => {
   })
 
   it('获取代币转账所需gas', async () => {
-      const gasObj = await tokenModel.calcTokenGas('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8', '0.004');
+      const gasObj = await tokenModel.calcTokenGas('0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '0xF02C7B189aDB95207AF90Fbd05347E1C58301Df8', 0);
       expect(gasObj).to.include.keys(['gasLimit', 'gasPrice', 'gasToEth']);
       expect(gasObj.gasPrice).to.be.a('string');
       expect(gasObj.gasLimit).to.be.a('number');

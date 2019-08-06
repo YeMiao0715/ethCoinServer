@@ -1,4 +1,4 @@
-import { EthTaskEventModel } from './../model/databaseModel/EthTaskEventModel';
+import { EthSendTaskEventModel } from '../model/databaseModel/EthSendTaskEventModel';
 import { db } from '../database/database';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
 import net from 'net';
@@ -32,7 +32,7 @@ async function handleData(data) {
   let privateKey = data.privateKey;
   delete data.privateKey;
   const transactionModel = new TransactionModel;
-  const ethTaskEventModel = new EthTaskEventModel;
+  const ethSendTaskEventModel = new EthSendTaskEventModel;
   const TxData = await transactionModel.signTransaction(data, privateKey);
 
   
@@ -42,7 +42,7 @@ async function handleData(data) {
         id: orderId,
         hash: hash
       });
-      ethTaskEventModel.updateEventState(orderId, {
+      ethSendTaskEventModel.updateEventState(orderId, {
         hash
       });
     })
@@ -51,8 +51,8 @@ async function handleData(data) {
         id: orderId,
         receipt
       });
-      ethTaskEventModel.updateEventState(orderId, {
-        state: EthTaskEventModel.STATE_FINISHE,
+      ethSendTaskEventModel.updateEventState(orderId, {
+        state: EthSendTaskEventModel.STATE_FINISHE,
         state_message: '成功',
         extends: receipt
       });
@@ -62,8 +62,8 @@ async function handleData(data) {
         id: orderId,
         error: error.message
       });
-      ethTaskEventModel.updateEventState(orderId, {
-        state: EthTaskEventModel.STATE_ERROR,
+      ethSendTaskEventModel.updateEventState(orderId, {
+        state: EthSendTaskEventModel.STATE_ERROR,
         state_message: error.message
       });
     });

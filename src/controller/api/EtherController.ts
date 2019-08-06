@@ -1,9 +1,13 @@
-import { EtherServer } from './../server/EtherServer';
+import { EtherServer } from '../../server/EtherServer';
 import Router from 'koa-router';
-import { checkAddress } from '../lib/utils';
+import { checkAddress } from '../../lib/utils';
 import net from 'net';
 import { isNumeric } from 'validator';
 const router = new Router();
+
+net.connect(process.env.QUEUE_PORT).on('error', error => {
+  throw error;
+})
 
 /**
  * eth 获取账户余额
@@ -138,7 +142,9 @@ router.post('/sendTransaction', async (ctx, next) => {
 
   try {
     const buildSendObject = await etherServer.bulidSendTransactionObject(from, to, amount, contractAddress);
+    buildSendObject['privateKey'] = privateKey;
     net.connect(process.env.QUEUE_PORT).write(JSON.stringify(buildSendObject));
+    delete buildSendObject['privateKey'];
     ctx.body = ctx.return('ok', buildSendObject);
   } catch (error) {
     ctx.throw(400, error.message);

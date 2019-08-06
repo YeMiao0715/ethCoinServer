@@ -73,11 +73,15 @@ export class TokenModel {
   async calcTokenGas(from: string, to: string, tokenAmount: string | number) {
     const gasPrice = await getGasPrice();
     tokenAmount = new dec(tokenAmount).mul(10 ** this.contractDecimal).toString();
-    const abiData = await this.buildTransactionAbiData(to, tokenAmount);
-    const gasLimit = await web3.eth.estimateGas({
-      from: this.contractCalcGasAddress, to: this.contractAddress, data: abiData, gasPrice
-    });
-
+    // const abiData = await this.buildTransactionAbiData(to, tokenAmount);
+    const gasLimit = await this.contract.methods.transfer(to, tokenAmount).estimateGas({
+      from: this.contractCalcGasAddress,
+      gasPrice
+    })
+    // const gasLimit = await web3.eth.estimateGas({
+    //   from: this.contractCalcGasAddress,
+    //   to: this.contractAddress, data: abiData, gasPrice
+    // });
     return {
       gasPrice,
       gasLimit,

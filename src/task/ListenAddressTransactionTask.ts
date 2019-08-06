@@ -196,10 +196,6 @@ async function start() {
 
 async function one(blockNumber) {
   await listenAddressInit();
-  // console.log(transactionListenAddressList);
-  // console.log(transactionListenAddressIndex);
-  // console.log(contractListenList);
-  // console.log(contractListenIndex);
   const blockData = await web3.eth.getBlock(blockNumber, true);
   blockData.transactions.map(transaction => {
     distributeTransaction(transaction)

@@ -2,7 +2,7 @@ import { TransactionModel } from './../model/ether/TransactionModel';
 import { TokenModel } from '../model/ether/TokenModel';
 import { EthCoinTypeModel } from '../model/databaseModel/EthCoinTypeModel';
 import { EthModel, GasObj } from "../model/ether/EthModel";
-import { EthTaskEventModel } from '../model/databaseModel/EthTaskEventModel';
+import { EthSendTaskEventModel } from '../model/databaseModel/EthSendTaskEventModel';
 import dec from 'decimal.js';
 import { web3 } from '../../config/web3.config';
 import * as wallet from 'ethereumjs-wallet';
@@ -78,7 +78,7 @@ export class EtherServer {
     if (contractAddress !== undefined) {
       const tokenModel = new TokenModel(contractAddress);
       await tokenModel.contractInit();
-      gasObj = await tokenModel.calcTokenGas(from, to, 0);
+      gasObj = await tokenModel.calcTokenGas(from, to, 1);
     } else {
       gasObj = await this.ethModel.calcEthGas(from, to, 0);
     }
@@ -97,7 +97,7 @@ export class EtherServer {
    */
   async bulidSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
     const transactionModel = new TransactionModel;
-    const ethTaskEventModel = new EthTaskEventModel;
+    const ethsendTaskEventModel = new EthSendTaskEventModel;
     let buildSendObject: any;
     let orderId: number;
     if (contractAddress !== undefined) {
@@ -106,7 +106,7 @@ export class EtherServer {
       if(value !== 'all') {
         await this.validatorAddressTokenAmount(from, contractAddress, value);
       }
-      const eventObj = await ethTaskEventModel.addSendTokenEventObj({
+      const eventObj = await ethsendTaskEventModel.addSendTokenEventObj({
         contract: contractAddress,
         from,
         to,
@@ -119,7 +119,7 @@ export class EtherServer {
       if(value !== 'all') {
         await this.validatorAddressEthAmount(from, value, buildSendObject.gasPrice, buildSendObject.gasLimit);
       }
-      const eventObj = await ethTaskEventModel.addSendEthEventObj({
+      const eventObj = await ethsendTaskEventModel.addSendEthEventObj({
         from,
         to,
         value
