@@ -1,5 +1,5 @@
 import { EthCoinTypeModel } from './EthCoinTypeModel';
-import { getRepository, getManager } from "typeorm";
+import { getRepository } from "typeorm";
 import { EthSendTaskEvent } from "../../database/entity/EthSendTaskEvent";
 
 export interface EthEventParam {
