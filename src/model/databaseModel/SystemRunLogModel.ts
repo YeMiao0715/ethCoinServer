@@ -18,7 +18,9 @@ export class SystemRunLogModel {
   // 网络请求日志
   static SCENE_HTTPREQUEST_INFO: number = 3;
   // 分发交易日志
-  static SCENE_SENDTRANSACTION_EVENT: number = 4;
+  static SCENE_SEND_TRANSACTION_EVENT: number = 4;
+  // 接受交易分发日志
+  static SCENE_RECEIVET_RANSACTION_EVENT: number = 4;
 
 
   /**

@@ -5,7 +5,11 @@
       "script": "app.ts"
     },
     {
-      "name": "sendTransactionQueue",
+      "name": "receiptQueue",
+      "script": "./src/queue/receiveTransactionQueue.ts"
+    },
+    {
+      "name": "sendQueue",
       "script": "./src/queue/sendTransactionQueue.ts"
     },
     {

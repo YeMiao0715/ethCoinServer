@@ -22,13 +22,13 @@ db().then(connect => {
   })
 
   server.listen(port, () => {
-    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, server.address());
+    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, server.address());
   })
 });
 
 async function handleData(data) {
   data = JSON.parse(data);
-  SystemRunLogModel.info('接收到数据', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, data);
+  SystemRunLogModel.info('接收到数据', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, data);
   let orderId = data.id;
   delete data.id;
   let privateKey = data.privateKey;
@@ -40,7 +40,7 @@ async function handleData(data) {
   
   transactionModel.sendTransaction(TxData)
     .on('transactionHash', (hash) => {
-      SystemRunLogModel.info('hash 打包', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, {
+      SystemRunLogModel.info('hash 打包', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, {
         id: orderId,
         hash: hash
       });
@@ -49,7 +49,7 @@ async function handleData(data) {
       });
     })
     .on('receipt', (receipt) => {
-      SystemRunLogModel.info('交易完成', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, {
+      SystemRunLogModel.info('交易完成', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, {
         id: orderId,
         receipt
       });
@@ -60,7 +60,7 @@ async function handleData(data) {
       });
     })
     .on('error', (error) => {
-      SystemRunLogModel.info('交易失败', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, {
+      SystemRunLogModel.info('交易失败', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, {
         id: orderId,
         error: error.message
       });

@@ -43,7 +43,8 @@
    },
    "scripts": {
       "start": "ts-node app.ts",
-      "queue": "ts-node ./src/queue/sendTransactionQueue.ts",
+      "sendQueue": "ts-node ./src/queue/sendTransactionQueue.ts",
+      "receiptQueue": "ts-node ./src/queue/receiveTransactionQueue.ts",
       "coinTypeInit": "ts-node ./src/init/EthCoinType.init.ts",
       "listenAddressTask": "ts-node ./src/task/ListenAddressTransactionTask.ts",
       "dev": "nodemon app.ts",

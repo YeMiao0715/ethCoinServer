@@ -7,7 +7,17 @@ import { Transaction } from "web3/eth/types";
 import { EthCoinTypeModel } from "../model/databaseModel/EthCoinTypeModel";
 import { AddressTransactionListModel } from '../model/databaseModel/AddressTransactionListModel';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
+import net from 'net';
 import dec from 'decimal.js';
+import dotenv from 'dotenv';
+import { ReceiveMessage } from '../model/databaseModel/EthReceiveTaskEventModel';
+
+dotenv.config({
+  path: `${__dirname}/../../.env`
+});
+const client = net.connect(process.env.RECEIVE_QUEUE_PORT).on('error', error => {
+  throw error;
+})
 
 const listenAddressModel = new ListenAddressModel;
 const blockRecord = new BlockRecordModel;
@@ -92,8 +102,17 @@ async function distributeTransaction(transaction: Transaction) {
         // 合约接受记录
         await saveTokenTransaction(log, AddressTransactionListModel.TYPE_RECEIVE, log.to);
 
-        if(log.to === '') {
+        if(log.to === '0x6d1056f53a24Ee9052898bCc30AbCc40166eebad') {
           // TODO: 对某地址进行特殊操作
+          buildReceiveMessage({
+            blockNumber: log.blockNumber,
+            hash: log.hash,
+            from: log.from,
+            to: log.to,
+            amount: log.amount,
+            contract: log.contract,
+            extends: transaction
+          });
         }
       }
     }
@@ -107,6 +126,19 @@ async function distributeTransaction(transaction: Transaction) {
     if (transactionListenAddressList.has(transaction.to)) {
       // 接受记录
       await saveEthTransaction(transaction, AddressTransactionListModel.TYPE_RECEIVE, transaction.to);
+
+      if(transaction.to === '0x6d1056f53a24Ee9052898bCc30AbCc40166eebad') {
+        // TODO: 对某地址进行特殊操作
+        buildReceiveMessage({
+          blockNumber: transaction.blockNumber,
+          hash: transaction.hash,
+          from: transaction.from,
+          to: transaction.to,
+          amount: web3.utils.fromWei(transaction.value, 'ether'),
+          contract: null,
+          extends: transaction
+        });
+      }
     }
   }
 }
@@ -168,6 +200,10 @@ async function saveTokenTransaction(transaction: any, type: number, eventAddress
   }
 }
 
+async function buildReceiveMessage(transaction: ReceiveMessage) {
+  client.write(JSON.stringify(transaction));
+}
+
 /**
  * 暂停方法
  * @param {*} time
@@ -204,6 +240,7 @@ async function one(blockNumber) {
 }
 
 db().then(connect => {
-  start();
-  // one(8276915);
+  // start();
+  one(8268345);
+  // one(8277002);
 })

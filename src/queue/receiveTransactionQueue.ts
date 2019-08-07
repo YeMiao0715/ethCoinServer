@@ -10,6 +10,8 @@ dotenv.config({
 
 const port = process.env.RECEIVE_QUEUE_PORT;
 
+const ethReceiveTaskEventModel = new EthReceiveTaskEventModel;
+
 db().then(connect => {
   const server = net.createServer((socket) => {
     socket.on('data', data => {
@@ -22,10 +24,17 @@ db().then(connect => {
   })
 
   server.listen(port, () => {
-    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SENDTRANSACTION_EVENT, server.address());
+    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, server.address());
   })
 });
 
 async function handleData(data) {
+  data = JSON.parse(data);
+  await SystemRunLogModel.info('接受信息', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, data);
+  if(data.contract === null) {
+    await ethReceiveTaskEventModel.addReceiveEthEventObj(data)
+  }else{
+    await ethReceiveTaskEventModel.addReceiveTokenEventObj(data)
+  }
 
 }

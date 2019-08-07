@@ -2,17 +2,14 @@ import { EthCoinTypeModel } from './EthCoinTypeModel';
 import { getRepository } from "typeorm";
 import { EthReceiveTaskEvent } from "../../database/entity/EthReceiveTaskEvent";
 
-export interface EthEventParam {
-  from: string,
-  to: string,
-  value: string| number
-}
-
-export interface TokenEventParam {
-  contract: string,
-  from: string,
-  to: string,
-  value: string| number
+export interface ReceiveMessage{
+  blockNumber: number;
+  hash: string;
+  from: string;
+  to: string;
+  amount: string;
+  contract: string;
+  extends: object;
 }
 
 export interface UpdataStateParam {
@@ -57,11 +54,16 @@ export class EthReceiveTaskEventModel {
    * @returns
    * @memberof EthReceiveEventModel
    */
-  async addReceiveEthEventObj(eventParam: EthEventParam) {
+  async addReceiveEthEventObj(eventParam: ReceiveMessage) {
+    
     const ethReceiveTaskEvent = new EthReceiveTaskEvent;
     ethReceiveTaskEvent.event_type = EthReceiveTaskEventModel.EVENT_TYPE_RECEIVE_ETH.name;
     ethReceiveTaskEvent.type = EthReceiveTaskEventModel.EVENT_TYPE_RECEIVE_ETH.type;
-    ethReceiveTaskEvent.event_param = JSON.stringify(eventParam);
+    ethReceiveTaskEvent.extends = JSON.stringify(eventParam.extends);
+    let param = eventParam;
+    delete param.extends;
+    ethReceiveTaskEvent.event_param = JSON.stringify(param);
+    ethReceiveTaskEvent.hash = param.hash;
     ethReceiveTaskEvent.state = EthReceiveTaskEventModel.STATE_SUCCESS;
     ethReceiveTaskEvent.coin_name = 'eth';
     ethReceiveTaskEvent.callback_state = EthReceiveTaskEventModel.CALLBACK_STATE_UNFINISHED;
@@ -76,11 +78,15 @@ export class EthReceiveTaskEventModel {
    * @returns
    * @memberof EthReceiveEventModel
    */
-  async addReceiveTokenEventObj(eventParam: TokenEventParam) {
+  async addReceiveTokenEventObj(eventParam: ReceiveMessage) {
     const ethReceiveTaskEvent = new EthReceiveTaskEvent;
     ethReceiveTaskEvent.event_type = EthReceiveTaskEventModel.EVENT_TYPE_RECEIVE_TOKEN.name;
     ethReceiveTaskEvent.type = EthReceiveTaskEventModel.EVENT_TYPE_RECEIVE_TOKEN.type;
-    ethReceiveTaskEvent.event_param = JSON.stringify(eventParam);
+    ethReceiveTaskEvent.extends = JSON.stringify(eventParam.extends);
+    let param = eventParam;
+    delete param.extends;
+    ethReceiveTaskEvent.event_param = JSON.stringify(param);
+    ethReceiveTaskEvent.hash = param.hash;
     ethReceiveTaskEvent.state = EthReceiveTaskEventModel.STATE_SUCCESS;
     const ethCoinTypeModel = new EthCoinTypeModel;
     const contractInfo = await ethCoinTypeModel.getContractInfo(eventParam.contract);
