@@ -21,6 +21,7 @@ export interface UpdataStateParam {
   callback_state?: number;
   callback_state_message?: string;
   hash?: string;
+  block_number?: number;
   extends?: object;
 }
 
@@ -62,7 +63,9 @@ export class EthSendTaskEventModel {
     ethSendTaskEvent.type = EthSendTaskEventModel.EVENT_TYPE_ETH.type;
     ethSendTaskEvent.event_param = JSON.stringify(eventParam);
     ethSendTaskEvent.state = EthSendTaskEventModel.STATE_UNFINISHED;
-    ethSendTaskEvent.coin_name = 'eth';
+    const ethCoinTypeModel = new EthCoinTypeModel;
+    const ethInfo = await ethCoinTypeModel.getEthInfo();
+    ethSendTaskEvent.coin_id = ethInfo.id;
     ethSendTaskEvent.callback_state = EthSendTaskEventModel.CALLBACK_STATE_UNFINISHED;
     return await getRepository(EthSendTaskEvent).save(ethSendTaskEvent);
   }
@@ -81,7 +84,7 @@ export class EthSendTaskEventModel {
     ethSendTaskEvent.state = EthSendTaskEventModel.STATE_UNFINISHED;
     const ethCoinTypeModel = new EthCoinTypeModel;
     const contractInfo = await ethCoinTypeModel.getContractInfo(eventParam.contract);
-    ethSendTaskEvent.coin_name = contractInfo.name;
+    ethSendTaskEvent.coin_id = contractInfo.id;
     ethSendTaskEvent.callback_state = EthSendTaskEventModel.CALLBACK_STATE_UNFINISHED;
     return await getRepository(EthSendTaskEvent).save(ethSendTaskEvent);
   }

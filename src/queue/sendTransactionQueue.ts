@@ -56,6 +56,7 @@ async function handleData(data) {
       ethSendTaskEventModel.updateEventState(orderId, {
         state: EthSendTaskEventModel.STATE_FINISHE,
         state_message: '成功',
+        block_number: receipt.blockNumber,
         extends: receipt
       });
     })

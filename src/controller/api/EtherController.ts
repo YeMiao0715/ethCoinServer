@@ -141,7 +141,7 @@ router.post('/sendTransaction', async (ctx, next) => {
   }
 
   try {
-    const buildSendObject = await etherServer.bulidSendTransactionObject(from, to, amount, contractAddress);
+    const buildSendObject = await etherServer.buildSendTransactionObject(from, to, amount, contractAddress);
     buildSendObject['privateKey'] = privateKey;
     net.connect(process.env.QUEUE_PORT).write(JSON.stringify(buildSendObject));
     delete buildSendObject['privateKey'];

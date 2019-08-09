@@ -95,7 +95,7 @@ export class EtherServer {
    * @returns
    * @memberof EtherServer
    */
-  async bulidSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
+  async buildSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
     const transactionModel = new TransactionModel;
     const ethsendTaskEventModel = new EthSendTaskEventModel;
     let buildSendObject: any;

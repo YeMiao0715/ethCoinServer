@@ -19,7 +19,7 @@ export class EthSendTaskEvent {
   type: number;
 
   @Column()
-  coin_name: string;
+  coin_id: number;
 
   @Column({
     type: 'text',
@@ -32,6 +32,9 @@ export class EthSendTaskEvent {
     comment: '状态[1: 进行中][2:已完成]'
   })
   state: number;
+
+  @Column()
+  block_number: number;
 
   @Column({
     length: 100,

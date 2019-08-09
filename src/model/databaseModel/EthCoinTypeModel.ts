@@ -12,6 +12,21 @@ export class EthCoinTypeModel {
   static STATE_OFF = false;
   static STATE_ON = true;
 
+
+
+  /**
+   * 获取eth 详情
+   *
+   * @returns
+   * @memberof EthCoinTypeModel
+   */
+  async getEthInfo() {
+    const find = await getRepository(EthCoinType).findOne({
+      is_contract: EthCoinTypeModel.IS_NOT_CONTRACT,
+    });
+    return find;
+  }
+
   /**
    * 获取合约列表
    * @memberof EthCoinTypeModel
@@ -122,7 +137,7 @@ export class EthCoinTypeModel {
   async getContractInfo(contract_address: string) {
     const find = await getRepository(EthCoinType)
       .createQueryBuilder('coinType')
-      .select(['coinType.abi', 'coinType.calc_gas_address', 'coinType.decimal', 'coinType.name'])
+      .select(['coinType.id', 'coinType.abi', 'coinType.calc_gas_address', 'coinType.decimal', 'coinType.name'])
       .where({
         contract_address,
         is_contract: EthCoinTypeModel.IS_CONTRACT,
@@ -151,6 +166,7 @@ export class EthCoinTypeModel {
       }
       
       return {
+        id: find.id,
         abi,
         calcGasAddress,
         name: find.name,

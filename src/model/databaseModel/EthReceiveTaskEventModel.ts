@@ -65,7 +65,10 @@ export class EthReceiveTaskEventModel {
     ethReceiveTaskEvent.event_param = JSON.stringify(param);
     ethReceiveTaskEvent.hash = param.hash;
     ethReceiveTaskEvent.state = EthReceiveTaskEventModel.STATE_SUCCESS;
-    ethReceiveTaskEvent.coin_name = 'eth';
+    const ethCoinTypeModel = new EthCoinTypeModel;
+    const ethInfo = await ethCoinTypeModel.getEthInfo();
+    ethReceiveTaskEvent.coin_id = ethInfo.id;
+    ethReceiveTaskEvent.block_number = eventParam.blockNumber;
     ethReceiveTaskEvent.callback_state = EthReceiveTaskEventModel.CALLBACK_STATE_UNFINISHED;
     return await getRepository(EthReceiveTaskEvent).save(ethReceiveTaskEvent);
   }
@@ -90,7 +93,8 @@ export class EthReceiveTaskEventModel {
     ethReceiveTaskEvent.state = EthReceiveTaskEventModel.STATE_SUCCESS;
     const ethCoinTypeModel = new EthCoinTypeModel;
     const contractInfo = await ethCoinTypeModel.getContractInfo(eventParam.contract);
-    ethReceiveTaskEvent.coin_name = contractInfo.name;
+    ethReceiveTaskEvent.coin_id = contractInfo.id;
+    ethReceiveTaskEvent.block_number = eventParam.blockNumber;
     ethReceiveTaskEvent.callback_state = EthReceiveTaskEventModel.CALLBACK_STATE_UNFINISHED;
     return await getRepository(EthReceiveTaskEvent).save(ethReceiveTaskEvent);
   }
