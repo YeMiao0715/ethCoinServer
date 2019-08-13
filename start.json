@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "mainServer",
+      "name": "httpServer",
       "script": "app.ts"
     },
     {

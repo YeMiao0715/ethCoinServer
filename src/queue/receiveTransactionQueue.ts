@@ -24,7 +24,7 @@ db().then(connect => {
   })
 
   server.listen(port, () => {
-    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, server.address());
+    SystemRunLogModel.info('eth交易接受数据处理服务开启', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, server.address());
   })
 });
 

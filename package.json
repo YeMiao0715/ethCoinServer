@@ -43,6 +43,8 @@
    },
    "scripts": {
       "start": "ts-node app.ts",
+      "pm2": "pm2 start start.json",
+      "restart": "pm2 restart start.json",
       "sendQueue": "ts-node ./src/queue/sendTransactionQueue.ts",
       "receiptQueue": "ts-node ./src/queue/receiveTransactionQueue.ts",
       "coinTypeInit": "ts-node ./src/init/EthCoinType.init.ts",
