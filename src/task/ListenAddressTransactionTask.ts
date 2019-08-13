@@ -240,7 +240,7 @@ async function one(blockNumber) {
 }
 
 db().then(connect => {
-  // start();
-  one(8268345);
+  start();
+  // one(8268345);
   // one(8277002);
 })

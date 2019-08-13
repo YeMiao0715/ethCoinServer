@@ -1,16 +1,16 @@
 {
   "apps": [
     {
-      "name": "httpServer",
-      "script": "app.ts"
-    },
-    {
       "name": "receiptQueue",
       "script": "./src/queue/receiveTransactionQueue.ts"
     },
     {
       "name": "sendQueue",
       "script": "./src/queue/sendTransactionQueue.ts"
+    },
+    {
+      "name": "httpServer",
+      "script": "app.ts"
     },
     {
       "name": "listenAddressTask",

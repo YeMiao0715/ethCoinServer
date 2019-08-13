@@ -19,20 +19,13 @@ app.context.return = function(message: string, data: object = {}) {
 function checkIp(ip: string) {
   let status = false;
   let ipString = process.env.HTTP_SERVER_IP_LIST;
-  if(ipString.includes(',')){
-    const ipList = ipString.split(',');
-    ipList.map(value => {
-      if(ip === value) {
-        status = true
-      }
-    });
-  }else{
-    if(ip === ipString) {
-      status = true;
-    }else {
-      status = false;
+  const ipList = ipString.split(',');
+  ipList.map(value => {
+    console.log(value);
+    if(ip.includes(value)) {
+      status = true
     }
-  }
+  });
   return status;
 }
 
