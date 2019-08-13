@@ -1,5 +1,5 @@
 import { EtherServer } from '../../server/EtherServer';
-import Router, { url } from 'koa-router';
+import Router from 'koa-router';
 import { checkAddress } from '../../lib/utils';
 import net from 'net';
 import { isNumeric } from 'validator';
@@ -162,8 +162,6 @@ router.get('/getTransactionList/:address', async (ctx, next) => {
       ctx.throw(400, '用户地址解析错误');
     }
   }
-
-  
 
 })
 

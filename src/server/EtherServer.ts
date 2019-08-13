@@ -1,3 +1,4 @@
+import { AddressTransactionListModel } from './../model/databaseModel/AddressTransactionListModel';
 import { ListenAddressModel } from './../model/databaseModel/ListenAddressModel';
 import { TransactionModel } from './../model/ether/TransactionModel';
 import { TokenModel } from '../model/ether/TokenModel';
@@ -13,6 +14,7 @@ export class EtherServer {
   ethModel = new EthModel;
   ethCoinTypeModel = new EthCoinTypeModel;
   listenAddressModel = new ListenAddressModel;
+  addressTransactionListModel = new AddressTransactionListModel;
 
   async getAddressOrCreate(address: string) {
     const find = await this.listenAddressModel.findAddress(address);
@@ -282,6 +284,29 @@ export class EtherServer {
       });
     }
     return eventTransactions;
+  }
+
+
+  /**
+   * 获取地址交易记录
+   * @param {string} address
+   * @param {string} [contract=null]
+   * @param {number} page
+   * @param {number} [limit=20]
+   * @returns
+   * @memberof EtherServer
+   */
+  async getUserTransactionList(address: string, contract: string = null, page: number, limit: number = 20) {
+    const addressInfo = await this.listenAddressModel.findAddress(address);
+    let transactionList: object;
+    if(contract == null) {
+      const ethInfo = await this.ethCoinTypeModel.getEthInfo();
+      transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, ethInfo.id, page, limit);
+    }else{
+      const contractInfo = await this.ethCoinTypeModel.getContractInfo(contract);
+      transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, contractInfo.id, page, limit);
+    }
+    return transactionList;
   }
 
 }

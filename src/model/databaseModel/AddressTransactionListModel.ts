@@ -53,12 +53,27 @@ export class AddressTransactionListModel {
     }
   }
 
-  async getUserTransactionList(addressId: number, contractId: number = 0) {
+
+  /**
+   * 获取地址交易列表
+   * @param {number} addressId
+   * @param {number} coinId
+   * @param {number} [page=0]
+   * @param {number} [limit=20]
+   * @returns
+   * @memberof AddressTransactionListModel
+   */
+  async getUserTransactionList(addressId: number, coinId: number, page: number = 0, limit: number = 20) {
     const list = await getRepository(AddressTransaction)
       .createQueryBuilder('transaction')
       .where({
         address_id: addressId,
+        coin_id: coinId
       })
+      .offset(page * 20)
+      .limit(limit)
+      .getMany();
+    return list;
   }
 
 }
