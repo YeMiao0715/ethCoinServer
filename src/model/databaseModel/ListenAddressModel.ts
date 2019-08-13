@@ -5,6 +5,20 @@ import { getRepository } from 'typeorm';
 
 export class ListenAddressModel {
 
+
+  /** 
+   * 查找地址
+   * @param {string} address
+   * @returns
+   * @memberof ListenAddressModel
+   */
+  async findAddress(address: string) { 
+    const find = await getRepository(ListenAddress).findOne({
+      address: address
+    })
+    return find;
+  }
+
   /**
    * 添加一条监听地址
    * @param {string} address

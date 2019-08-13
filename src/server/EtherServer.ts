@@ -1,3 +1,4 @@
+import { ListenAddressModel } from './../model/databaseModel/ListenAddressModel';
 import { TransactionModel } from './../model/ether/TransactionModel';
 import { TokenModel } from '../model/ether/TokenModel';
 import { EthCoinTypeModel } from '../model/databaseModel/EthCoinTypeModel';
@@ -11,6 +12,15 @@ export class EtherServer {
 
   ethModel = new EthModel;
   ethCoinTypeModel = new EthCoinTypeModel;
+  listenAddressModel = new ListenAddressModel;
+
+  async getAddressOrCreate(address: string) {
+    const find = await this.listenAddressModel.findAddress(address);
+    if(!find) {
+      return await this.listenAddressModel.saveAddress(address);
+    }
+    return find;
+  }
 
   /**
    * 获取账户余额

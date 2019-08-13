@@ -1,11 +1,11 @@
 import { EtherServer } from '../../server/EtherServer';
-import Router from 'koa-router';
+import Router, { url } from 'koa-router';
 import { checkAddress } from '../../lib/utils';
 import net from 'net';
 import { isNumeric } from 'validator';
 const router = new Router();
 
-net.connect(process.env.QUEUE_PORT).on('error', error => {
+net.connect(process.env.SEND_QUEUE_PORT).on('error', error => {
   throw error;
 })
 
@@ -24,6 +24,7 @@ router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
   const etherServer = new EtherServer;
 
   try {
+    await etherServer.getAddressOrCreate(address);
     const accountList = await etherServer.getAccountAmount(address, coin_name);
     ctx.body = ctx.return('ok', {
       accountList
