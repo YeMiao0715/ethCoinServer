@@ -20,8 +20,8 @@ function checkIp(ip: string) {
   let status = false;
   let ipString = process.env.HTTP_SERVER_IP_LIST;
   const ipList = ipString.split(',');
+  console.log(ipList);
   ipList.map(value => {
-    console.log(value);
     if(ip.includes(value)) {
       status = true
     }

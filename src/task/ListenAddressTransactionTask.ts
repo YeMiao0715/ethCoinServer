@@ -152,11 +152,12 @@ async function distributeTransaction(transaction: Transaction) {
 async function saveEthTransaction(transaction: Transaction, type: number, eventAddress: string) {
   await SystemRunLogModel.info('处理hash ' + transaction.hash, SystemRunLogModel.SCENE_LIENT_INFO);
   const addressId = transactionListenAddressIndex.get(eventAddress);
+  const ethInfo = await ethCoinTypeModel.getEthInfo();
   try {
     await addressTransactionListModel.saveTransaction(
       type,
       addressId,
-      0,
+      ethInfo.id,
       transaction.blockNumber,
       transaction.hash,
       transaction.from,

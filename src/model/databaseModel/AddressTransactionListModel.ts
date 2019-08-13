@@ -16,14 +16,14 @@ export class AddressTransactionListModel {
    * @param {string} from
    * @param {string} to
    * @param {string} amount
-   * @param {string} contractId
+   * @param {string} coinId
    * @param {object} extend
    * @memberof AddressTransactionListModel
    */
   async saveTransaction(
     type: number, 
     addressId: number, 
-    contractId: number, 
+    coinId: number, 
     blockNumber: number, 
     hash: string, 
     from: string, 
@@ -42,7 +42,7 @@ export class AddressTransactionListModel {
       const addressTransaction = new AddressTransaction;
       addressTransaction.type = type;
       addressTransaction.address_id = addressId;
-      addressTransaction.contract_id = contractId;
+      addressTransaction.coin_id = coinId;
       addressTransaction.block_number = blockNumber.toString();
       addressTransaction.hash = hash;
       addressTransaction.from = from;
@@ -51,6 +51,14 @@ export class AddressTransactionListModel {
       addressTransaction.extends = JSON.stringify(extend);
       return await getRepository(AddressTransaction).save(addressTransaction);
     }
+  }
+
+  async getUserTransactionList(addressId: number, contractId: number = 0) {
+    const list = await getRepository(AddressTransaction)
+      .createQueryBuilder('transaction')
+      .where({
+        address_id: addressId,
+      })
   }
 
 }

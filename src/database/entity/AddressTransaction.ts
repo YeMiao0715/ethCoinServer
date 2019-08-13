@@ -12,7 +12,7 @@ export class AddressTransaction {
 
   @Index()
   @Column()
-  contract_id: number;
+  coin_id: number;
   
   @Column({
     type: 'tinyint',

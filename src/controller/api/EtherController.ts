@@ -5,7 +5,7 @@ import net from 'net';
 import { isNumeric } from 'validator';
 const router = new Router();
 
-net.connect(process.env.SEND_QUEUE_PORT).on('error', error => {
+const client = net.connect(process.env.SEND_QUEUE_PORT).on('error', error => {
   throw error;
 })
 
@@ -144,12 +144,27 @@ router.post('/sendTransaction', async (ctx, next) => {
   try {
     const buildSendObject = await etherServer.buildSendTransactionObject(from, to, amount, contractAddress);
     buildSendObject['privateKey'] = privateKey;
-    net.connect(process.env.QUEUE_PORT).write(JSON.stringify(buildSendObject));
+    client.write(JSON.stringify(buildSendObject));
     delete buildSendObject['privateKey'];
     ctx.body = ctx.return('ok', buildSendObject);
   } catch (error) {
     ctx.throw(400, error.message);
   }
+})
+
+router.get('/getTransactionList/:address', async (ctx, next) => {
+  let address = ctx.params.address;
+
+  if (address !== undefined) {
+    try {
+      address = checkAddress(address);
+    } catch (error) {
+      ctx.throw(400, '用户地址解析错误');
+    }
+  }
+
+  
+
 })
 
 

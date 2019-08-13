@@ -33,7 +33,10 @@ export class EthSendTaskEvent {
   })
   state: number;
 
-  @Column()
+  @Column({
+    nullable: true,
+    default: null,
+  })
   block_number: number;
 
   @Column({
