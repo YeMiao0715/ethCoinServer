@@ -290,21 +290,27 @@ export class EtherServer {
   /**
    * 获取地址交易记录
    * @param {string} address
-   * @param {string} [contract=null]
+   * @param {string} [coinName=null]
    * @param {number} page
    * @param {number} [limit=20]
    * @returns
    * @memberof EtherServer
    */
-  async getUserTransactionList(address: string, contract: string = null, page: number, limit: number = 20) {
+  async getUserTransactionList(address: string, coinName: string, page: number, limit: number = 20) {
     const addressInfo = await this.listenAddressModel.findAddress(address);
     let transactionList: object;
-    if(contract == null) {
-      const ethInfo = await this.ethCoinTypeModel.getEthInfo();
-      transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, ethInfo.id, page, limit);
-    }else{
-      const contractInfo = await this.ethCoinTypeModel.getContractInfo(contract);
-      transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, contractInfo.id, page, limit);
+    switch (coinName) {
+      case 'eth':
+          const ethInfo = await this.ethCoinTypeModel.getEthInfo();
+          transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, ethInfo.id, page, limit);
+        break;
+      default:
+        const contractObj = await this.ethCoinTypeModel.verifyCoinNameOrContractAddress(coinName);
+        console.log(contractObj);
+        if (contractObj !== false) {
+          const contractInfo = await this.ethCoinTypeModel.getContractInfo(contractObj.contract_address);
+          transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, contractInfo.id, page, limit);
+        }
     }
     return transactionList;
   }

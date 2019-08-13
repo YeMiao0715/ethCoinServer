@@ -70,8 +70,6 @@ export class AddressTransactionListModel {
         address_id: addressId,
         coin_id: coinId
       })
-      .offset(page * 20)
-      .limit(limit)
       .getMany();
     return list;
   }

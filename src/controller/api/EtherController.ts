@@ -127,7 +127,7 @@ router.post('/sendTransaction', async (ctx, next) => {
     }
   }
 
-  if (! isNumeric(amount)) {
+  if (!isNumeric(amount)) {
     if (amount !== 'all') {
       ctx.throw(400, '数量必须为数字或all');
     }
@@ -152,8 +152,14 @@ router.post('/sendTransaction', async (ctx, next) => {
   }
 })
 
-router.get('/getTransactionList/:address', async (ctx, next) => {
+/**
+ * 获取交易记录
+ */
+router.get('/getTransactionList/:coin_name/:address', async (ctx, next) => {
   let address = ctx.params.address;
+  let coin_name = ctx.params.coin_name;
+  let page = ctx.query.page ? ctx.query.page : 1;
+  let limit = ctx.query.limit ? ctx.query.limit : 20;
 
   if (address !== undefined) {
     try {
@@ -163,6 +169,15 @@ router.get('/getTransactionList/:address', async (ctx, next) => {
     }
   }
 
+  try {
+    const etherServer = new EtherServer;
+    const list = await etherServer.getUserTransactionList(address, coin_name, page, limit);
+    ctx.body = ctx.return('ok', {
+      list
+    });
+  } catch (error) {
+    ctx.throw(400, error.message);
+  }
 })
 
 
