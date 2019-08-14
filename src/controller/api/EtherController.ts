@@ -26,9 +26,7 @@ router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
   try {
     await etherServer.getAddressOrCreate(address);
     const accountList = await etherServer.getAccountAmount(address, coin_name);
-    ctx.body = ctx.return('ok', {
-      accountList
-    });
+    ctx.body = accountList;
   } catch (error) {
     ctx.throw(400, error.message);
   }
@@ -50,7 +48,7 @@ router.get('/calaGasAmount/:coinName/:address', async (ctx, next) => {
   const etherServer = new EtherServer;
   try {
     const gasObj = await etherServer.calcGasToEthAmount(address, coinName);
-    ctx.body = ctx.return('ok', gasObj);
+    ctx.body = gasObj;
   } catch (error) {
     ctx.throw(400, error.message);
   }
@@ -81,7 +79,7 @@ router.get('/getMaxSendAmount', async (ctx, next) => {
   const etherServer = new EtherServer;
   try {
     const maxAmountObj = await etherServer.getMaxSendAmount(from, from, contractAddress);
-    ctx.body = ctx.return('ok', maxAmountObj);
+    ctx.body = maxAmountObj;
   } catch (error) {
     ctx.throw(400, error.message);
   }
@@ -137,7 +135,7 @@ router.post('/sendTransaction', async (ctx, next) => {
     buildSendObject['privateKey'] = privateKey;
     client.write(JSON.stringify(buildSendObject));
     delete buildSendObject['privateKey'];
-    ctx.body = ctx.return('ok', buildSendObject);
+    ctx.body = buildSendObject;
   } catch (error) {
     ctx.throw(400, error.message);
   }
@@ -170,9 +168,7 @@ router.get('/getTransactionList/:coin_name/:address', async (ctx, next) => {
   try {
     const etherServer = new EtherServer;
     const list = await etherServer.getUserTransactionList(address, coin_name, type, page, limit);
-    ctx.body = ctx.return('ok', {
-      list
-    });
+    ctx.body = list
   } catch (error) {
     ctx.throw(400, error.message);
   }

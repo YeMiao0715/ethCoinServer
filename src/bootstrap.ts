@@ -5,12 +5,6 @@ import { WebRunLogModel } from './model/databaseModel/WebRunLogModel';
 
 const app = new Koa();
 
-app.context.return = function(message: string, data: object = {}) {
-  return {
-    message, data
-  }
-}
-
 /**
  * 检测安全组
  * @param {string} ip
@@ -20,7 +14,6 @@ function checkIp(ip: string) {
   let status = false;
   let ipString = process.env.HTTP_SERVER_IP_LIST;
   const ipList = ipString.split(',');
-  console.log(ipList);
   ipList.map(value => {
     if(ip.includes(value)) {
       status = true
