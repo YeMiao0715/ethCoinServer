@@ -1,4 +1,3 @@
-import { AddressTransactionListModel } from './../../model/databaseModel/AddressTransactionListModel';
 import { EtherServer } from '../../server/EtherServer';
 import Router from 'koa-router';
 import { checkAddress } from '../../lib/utils';
@@ -159,6 +158,12 @@ router.get('/getTransactionList/:coin_name/:address', async (ctx, next) => {
       address = checkAddress(address);
     } catch (error) {
       ctx.throw(400, '用户地址解析错误');
+    }
+  }
+
+  if (!isNumeric(type)) {
+    if (type !== 'all') {
+      ctx.throw(400, '类型必须为数字或all');
     }
   }
 
