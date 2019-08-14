@@ -43,6 +43,9 @@ export class EthReceiveTaskEvent {
   })
   hash: string;
 
+  @Column()
+  amount: string;
+
   @Column({
     type: 'text',
     comment: '状态运行信息或错误信息',

@@ -1,3 +1,4 @@
+import { ConfigModel } from './../model/databaseModel/ConfigModel';
 import { EtherServer } from './../server/EtherServer';
 import { ListenAddressModel } from "../model/databaseModel/ListenAddressModel";
 import { db } from "../database/database";
@@ -24,6 +25,7 @@ const blockRecord = new BlockRecordModel;
 const ethCoinTypeModel = new EthCoinTypeModel;
 const etherServer = new EtherServer;
 const addressTransactionListModel = new AddressTransactionListModel;
+const configModel = new ConfigModel;
 
 const transactionListenAddressList = new Set();
 const transactionListenAddressIndex = new Map();
@@ -101,9 +103,9 @@ async function distributeTransaction(transaction: Transaction) {
       if (transactionListenAddressList.has(log.to)) {
         // 合约接受记录
         await saveTokenTransaction(log, AddressTransactionListModel.TYPE_RECEIVE, log.to);
-
-        if(log.to === '0x6d1056f53a24Ee9052898bCc30AbCc40166eebad') {
-          // TODO: 对某地址进行特殊操作
+        const listenAddress = configModel.getListenAddress();
+        if(log.to === listenAddress) {
+          // 对某地址进行特殊操作
           buildReceiveMessage({
             blockNumber: log.blockNumber,
             hash: log.hash,
@@ -121,24 +123,6 @@ async function distributeTransaction(transaction: Transaction) {
     if (transactionListenAddressList.has(transaction.from)) {
       // send记录
       await saveEthTransaction(transaction, AddressTransactionListModel.TYPE_SEND, transaction.from);
-    }
-  
-    if (transactionListenAddressList.has(transaction.to)) {
-      // 接受记录
-      await saveEthTransaction(transaction, AddressTransactionListModel.TYPE_RECEIVE, transaction.to);
-
-      if(transaction.to === '0x6d1056f53a24Ee9052898bCc30AbCc40166eebad') {
-        // TODO: 对某地址进行特殊操作
-        buildReceiveMessage({
-          blockNumber: transaction.blockNumber,
-          hash: transaction.hash,
-          from: transaction.from,
-          to: transaction.to,
-          amount: web3.utils.fromWei(transaction.value, 'ether'),
-          contract: null,
-          extends: transaction
-        });
-      }
     }
   }
 }
