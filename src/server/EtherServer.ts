@@ -36,11 +36,11 @@ export class EtherServer {
     let amountObj = [];
     switch (coinName) {
       case 'eth':
-        amountObj.push({
+        return {
           name: 'eth',
           contractAddress: null,
           amount: await this.ethModel.getEthAmount(address)
-        });
+        };
         break;
       case 'all':
         amountObj.push({
@@ -64,11 +64,11 @@ export class EtherServer {
         if (contractObj !== false) {
           const tokenModel = new TokenModel(contractObj.contract_address);
           await tokenModel.contractInit();
-          amountObj.push({
-            name: coinName,
+          return {
+            name: contractObj.name,
             contractAddress: contractObj.contract_address,
             amount: await tokenModel.getTokenAmount(address)
-          });
+          };
         } else {
           throw new Error(coinName + '币种不支持');
         }

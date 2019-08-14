@@ -12,7 +12,7 @@ const client = net.connect(process.env.SEND_QUEUE_PORT).on('error', error => {
 /**
  * eth 获取账户余额
  */
-router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
+router.get('/getAccountAmount/:address/:coin_name', async (ctx, next) => {
   let coin_name = ctx.params.coin_name;
   let address = ctx.params.address;
   try {
@@ -35,7 +35,7 @@ router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
 /**
  * 计算gas所需数量
  */
-router.get('/calaGasAmount/:coinName/:address', async (ctx, next) => {
+router.get('/calaGasAmount/:address/:coinName', async (ctx, next) => {
   let coinName = ctx.params.coinName;
   let address = ctx.params.address;
 
@@ -144,7 +144,7 @@ router.post('/sendTransaction', async (ctx, next) => {
 /**
  * 获取交易记录
  */
-router.get('/getTransactionList/:coin_name/:address', async (ctx, next) => {
+router.get('/getTransactionList/:address/:coin_name', async (ctx, next) => {
   let address = ctx.params.address;
   let coin_name = ctx.params.coin_name;
   let type = ctx.query.type ? ctx.query.type : 'all';
