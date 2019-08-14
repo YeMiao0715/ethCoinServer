@@ -88,12 +88,12 @@ router.get('/getMaxSendAmount', async (ctx, next) => {
 /**
  * 调起交易
  */
-router.post('/sendTransaction', async (ctx, next) => {
+router.post('/sendTransaction/:coinName', async (ctx, next) => {
   let post = ctx.request.body;
   let from = post.from;
   let to = post.to;
   let amount = post.amount;
-  let contractAddress = post.contractAddress;
+  let coinName = ctx.params.coinName;
   let privateKey = post.privateKey;
 
   try {
@@ -106,14 +106,6 @@ router.post('/sendTransaction', async (ctx, next) => {
     to = checkAddress(to);
   } catch (error) {
     ctx.throw(400, 'to地址解析错误');
-  }
-
-  if (contractAddress !== undefined) {
-    try {
-      contractAddress = checkAddress(contractAddress);
-    } catch (error) {
-      ctx.throw(400, '合约地址解析错误');
-    }
   }
 
   if (!isNumeric(amount)) {
@@ -131,7 +123,7 @@ router.post('/sendTransaction', async (ctx, next) => {
   }
 
   try {
-    const buildSendObject = await etherServer.buildSendTransactionObject(from, to, amount, contractAddress);
+    const buildSendObject = await etherServer.buildSendTransactionObject(from, to, amount, coinName);
     buildSendObject['privateKey'] = privateKey;
     client.write(JSON.stringify(buildSendObject));
     delete buildSendObject['privateKey'];

@@ -113,40 +113,51 @@ export class EtherServer {
    * @param {string} from
    * @param {string} to
    * @param {(string | number)} value
-   * @param {(string | undefined)} contractAddress
+   * @param {(string)} coinName
    * @returns
    * @memberof EtherServer
    */
-  async buildSendTransactionObject(from: string, to: string, value: string | number, contractAddress: string | undefined) {
+  async buildSendTransactionObject(from: string, to: string, value: string | number, coinName: string = 'eth') {
     const transactionModel = new TransactionModel;
     const ethsendTaskEventModel = new EthSendTaskEventModel;
     let buildSendObject: any;
     let orderId: number;
-    if (contractAddress !== undefined) {
-      buildSendObject = await transactionModel.buildTokenTransaction(contractAddress, from, to, value);
-      await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
-      if(value !== 'all') {
-        await this.validatorAddressTokenAmount(from, contractAddress, value);
-      }
-      const eventObj = await ethsendTaskEventModel.addSendTokenEventObj({
-        contract: contractAddress,
-        from,
-        to,
-        value
-      })
-      orderId = eventObj.id
-    } else {
-      buildSendObject = await transactionModel.buildEthTransaction(from, to, value);
-      await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
-      if(value !== 'all') {
-        await this.validatorAddressEthAmount(from, value, buildSendObject.gasPrice, buildSendObject.gasLimit);
-      }
-      const eventObj = await ethsendTaskEventModel.addSendEthEventObj({
-        from,
-        to,
-        value
-      })
-      orderId = eventObj.id
+
+    switch (coinName) {
+      case 'eth': 
+        buildSendObject = await transactionModel.buildEthTransaction(from, to, value);
+        await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
+        if(value !== 'all') {
+          await this.validatorAddressEthAmount(from, value, buildSendObject.gasPrice, buildSendObject.gasLimit);
+        }
+        const eventObj = await ethsendTaskEventModel.addSendEthEventObj({
+          from,
+          to,
+          value
+        })
+        orderId = eventObj.id
+        break;
+      default:
+          const contractObj = await this.ethCoinTypeModel.verifyCoinNameOrContractAddress(coinName);
+          if (contractObj !== false) {
+            buildSendObject = await transactionModel.buildTokenTransaction(contractObj.contract_address, from, to, value);
+            await this.validatorAddressGas(from, buildSendObject.gasPrice, buildSendObject.gasLimit);
+            
+            if(value !== 'all') {
+              await this.validatorAddressTokenAmount(from, contractObj.contract_address, value);
+            }
+
+            const eventObj = await ethsendTaskEventModel.addSendTokenEventObj({
+              contract: contractObj.contract_address,
+              from,
+              to,
+              value
+            })
+            orderId = eventObj.id
+          }else{
+            throw new Error(`[${coinName}] 该币种不支持`);
+          }
+        break;
     }
 
     let data: object = {
