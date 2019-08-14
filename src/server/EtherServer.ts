@@ -8,6 +8,7 @@ import { EthSendTaskEventModel } from '../model/databaseModel/EthSendTaskEventMo
 import dec from 'decimal.js';
 import { web3 } from '../../config/web3.config';
 import * as wallet from 'ethereumjs-wallet';
+import { AddressTransaction } from '../database/entity/AddressTransaction';
 
 export class EtherServer {
 
@@ -85,14 +86,23 @@ export class EtherServer {
    * @returns
    * @memberof EtherServer
    */
-  async calcGasToEthAmount(from: string, to: string, contractAddress: string | undefined = undefined) {
+  async calcGasToEthAmount(address: string, coinName: string = 'eth') {
     let gasObj: GasObj;
-    if (contractAddress !== undefined) {
-      const tokenModel = new TokenModel(contractAddress);
-      await tokenModel.contractInit();
-      gasObj = await tokenModel.calcTokenGas(from, to, 1);
-    } else {
-      gasObj = await this.ethModel.calcEthGas(from, to, 0);
+
+    switch (coinName) {
+      case 'eth':
+          gasObj = await this.ethModel.calcEthGas(address, address, 0);    
+        break;
+      default:
+          const contractObj = await this.ethCoinTypeModel.verifyCoinNameOrContractAddress(coinName);
+          if (contractObj !== false) {
+            const tokenModel = new TokenModel(contractObj.contract_address);
+            await tokenModel.contractInit();
+            gasObj = await tokenModel.calcTokenGas(address, address, 1);  
+          }else{
+            throw new Error(`[${coinName}] 该币种不支持`);
+          }
+        break;
     }
     return gasObj;
   }
@@ -296,20 +306,22 @@ export class EtherServer {
    * @returns
    * @memberof EtherServer
    */
-  async getUserTransactionList(address: string, coinName: string, page: number, limit: number = 20) {
+  async getUserTransactionList(address: string, coinName: string, type: number | string, page: number, limit: number = 20) {
     const addressInfo = await this.listenAddressModel.findAddress(address);
-    let transactionList: object;
+    let transactionList: AddressTransaction[];
+    type = type == 'all' ? 0 : type;
     switch (coinName) {
       case 'eth':
           const ethInfo = await this.ethCoinTypeModel.getEthInfo();
-          transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, ethInfo.id, page, limit);
+          transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, ethInfo.id, type, page, limit);
         break;
       default:
         const contractObj = await this.ethCoinTypeModel.verifyCoinNameOrContractAddress(coinName);
-        console.log(contractObj);
         if (contractObj !== false) {
           const contractInfo = await this.ethCoinTypeModel.getContractInfo(contractObj.contract_address);
-          transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, contractInfo.id, page, limit);
+          transactionList = await this.addressTransactionListModel.getUserTransactionList(addressInfo.id, contractInfo.id, type, page, limit);
+        }else{
+          throw new Error(`[${coinName}] 该币种不支持`);
         }
     }
     return transactionList;

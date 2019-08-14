@@ -63,14 +63,28 @@ export class AddressTransactionListModel {
    * @returns
    * @memberof AddressTransactionListModel
    */
-  async getUserTransactionList(addressId: number, coinId: number, page: number = 0, limit: number = 20) {
-    const list = await getRepository(AddressTransaction)
-      .createQueryBuilder('transaction')
-      .where({
-        address_id: addressId,
-        coin_id: coinId
-      })
-      .getMany();
+  async getUserTransactionList(addressId: number, coinId: number, type: number | string = 0, page: number = 0, limit: number = 20) {
+    let list: AddressTransaction[];
+    if(type == 0) {
+      list = await getRepository(AddressTransaction)
+        .createQueryBuilder('transaction')
+        .where({
+          address_id: addressId,
+          coin_id: coinId
+        })
+        .orderBy('create_time', 'DESC')
+        .getMany();
+    }else{
+      list = await getRepository(AddressTransaction)
+        .createQueryBuilder('transaction')
+        .where({
+          address_id: addressId,
+          coin_id: coinId,
+          type: type
+        })
+        .orderBy('create_time', 'DESC')
+        .getMany();
+    }
     return list;
   }
 

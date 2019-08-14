@@ -1,3 +1,4 @@
+import { AddressTransactionListModel } from './../../model/databaseModel/AddressTransactionListModel';
 import { EtherServer } from '../../server/EtherServer';
 import Router from 'koa-router';
 import { checkAddress } from '../../lib/utils';
@@ -37,28 +38,19 @@ router.get('/getAccountAmount/:coin_name/:address', async (ctx, next) => {
 /**
  * 计算gas所需数量
  */
-router.post('/calaGasAmount', async (ctx, next) => {
-  let post = ctx.request.body;
-  let from = post.from;
-  let contractAddress = post.contractAddress;
+router.get('/calaGasAmount/:coinName/:address', async (ctx, next) => {
+  let coinName = ctx.params.coinName;
+  let address = ctx.params.address;
 
   try {
-    from = checkAddress(from);
+    address = checkAddress(address);
   } catch (error) {
     ctx.throw(400, 'from地址解析错误');
   }
 
-  if (contractAddress !== undefined) {
-    try {
-      contractAddress = checkAddress(contractAddress);
-    } catch (error) {
-      ctx.throw(400, '合约地址解析错误');
-    }
-  }
-
   const etherServer = new EtherServer;
   try {
-    const gasObj = await etherServer.calcGasToEthAmount(from, from, contractAddress);
+    const gasObj = await etherServer.calcGasToEthAmount(address, coinName);
     ctx.body = ctx.return('ok', gasObj);
   } catch (error) {
     ctx.throw(400, error.message);
@@ -158,6 +150,7 @@ router.post('/sendTransaction', async (ctx, next) => {
 router.get('/getTransactionList/:coin_name/:address', async (ctx, next) => {
   let address = ctx.params.address;
   let coin_name = ctx.params.coin_name;
+  let type = ctx.query.type ? ctx.query.type : 'all';
   let page = ctx.query.page ? ctx.query.page : 1;
   let limit = ctx.query.limit ? ctx.query.limit : 20;
 
@@ -171,7 +164,7 @@ router.get('/getTransactionList/:coin_name/:address', async (ctx, next) => {
 
   try {
     const etherServer = new EtherServer;
-    const list = await etherServer.getUserTransactionList(address, coin_name, page, limit);
+    const list = await etherServer.getUserTransactionList(address, coin_name, type, page, limit);
     ctx.body = ctx.return('ok', {
       list
     });
