@@ -9,16 +9,12 @@ import { EthCoinTypeModel } from "../model/databaseModel/EthCoinTypeModel";
 import { AddressTransactionListModel } from '../model/databaseModel/AddressTransactionListModel';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
 import net from 'net';
-import dec from 'decimal.js';
 import dotenv from 'dotenv';
 import { ReceiveMessage } from '../model/databaseModel/EthReceiveTaskEventModel';
 
 dotenv.config({
   path: `${__dirname}/../../.env`
 });
-const client = net.connect(process.env.RECEIVE_QUEUE_PORT).on('error', error => {
-  throw error;
-})
 
 const listenAddressModel = new ListenAddressModel;
 const blockRecord = new BlockRecordModel;
@@ -176,7 +172,7 @@ async function saveTokenTransaction(transaction: any, type: number, eventAddress
       transaction.hash,
       transaction.from,
       transaction.to,
-      new dec(transaction.amount).div(10 ** tokenInfo.decimal).toString(),
+      transaction.amount,
       transaction
     )
     await listenAddressModel.updateBlockNumber(addressId, transaction.blockNumber, 1);  
@@ -186,7 +182,7 @@ async function saveTokenTransaction(transaction: any, type: number, eventAddress
 }
 
 async function buildReceiveMessage(transaction: ReceiveMessage) {
-  client.write(JSON.stringify(transaction));
+  net.connect(process.env.RECEIVE_QUEUE_PORT).write(JSON.stringify(transaction));
 }
 
 /**
@@ -225,7 +221,7 @@ async function one(blockNumber) {
 }
 
 db().then(connect => {
-  // start();
-  one(8339853);
+  start();
+  // one(8339853);
   // one(8277002);
 })

@@ -5,9 +5,6 @@ import net from 'net';
 import { isNumeric } from 'validator';
 const router = new Router();
 
-const client = net.connect(process.env.SEND_QUEUE_PORT).on('error', error => {
-  throw error;
-})
 
 /**
  * eth 获取账户余额
@@ -125,7 +122,7 @@ router.post('/sendTransaction/:coinName', async (ctx, next) => {
   try {
     const buildSendObject = await etherServer.buildSendTransactionObject(from, to, amount, coinName);
     buildSendObject['privateKey'] = privateKey;
-    client.write(JSON.stringify(buildSendObject));
+    net.connect(process.env.SEND_QUEUE_PORT).write(JSON.stringify(buildSendObject));
     delete buildSendObject['privateKey'];
     ctx.body = buildSendObject;
   } catch (error) {

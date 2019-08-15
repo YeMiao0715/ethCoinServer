@@ -291,7 +291,7 @@ export class EtherServer {
             hash: value.transactionHash,
             from,
             to,
-            amount: new dec(amount).div(10 ** contractInfo.decimal).toString(),
+            amount: new dec(amount).div(10 ** contractInfo.decimal).toFixed(),
             contract: value.address,
           });
         });
