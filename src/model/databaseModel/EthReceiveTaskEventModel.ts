@@ -61,7 +61,6 @@ export class EthReceiveTaskEventModel {
     ethReceiveTaskEvent.type = EthReceiveTaskEventModel.EVENT_TYPE_RECEIVE_ETH.type;
     ethReceiveTaskEvent.extends = JSON.stringify(eventParam.extends);
     let param = eventParam;
-    delete param.extends;
     ethReceiveTaskEvent.event_param = JSON.stringify(param);
     ethReceiveTaskEvent.hash = param.hash;
     ethReceiveTaskEvent.state = EthReceiveTaskEventModel.STATE_SUCCESS;
@@ -69,6 +68,7 @@ export class EthReceiveTaskEventModel {
     const ethInfo = await ethCoinTypeModel.getEthInfo();
     ethReceiveTaskEvent.coin_id = ethInfo.id;
     ethReceiveTaskEvent.block_number = eventParam.blockNumber;
+    ethReceiveTaskEvent.amount = eventParam.amount;
     ethReceiveTaskEvent.callback_state = EthReceiveTaskEventModel.CALLBACK_STATE_UNFINISHED;
     return await getRepository(EthReceiveTaskEvent).save(ethReceiveTaskEvent);
   }
@@ -87,7 +87,6 @@ export class EthReceiveTaskEventModel {
     ethReceiveTaskEvent.type = EthReceiveTaskEventModel.EVENT_TYPE_RECEIVE_TOKEN.type;
     ethReceiveTaskEvent.extends = JSON.stringify(eventParam.extends);
     let param = eventParam;
-    delete param.extends;
     ethReceiveTaskEvent.event_param = JSON.stringify(param);
     ethReceiveTaskEvent.hash = param.hash;
     ethReceiveTaskEvent.state = EthReceiveTaskEventModel.STATE_SUCCESS;
@@ -95,6 +94,7 @@ export class EthReceiveTaskEventModel {
     const contractInfo = await ethCoinTypeModel.getContractInfo(eventParam.contract);
     ethReceiveTaskEvent.coin_id = contractInfo.id;
     ethReceiveTaskEvent.block_number = eventParam.blockNumber;
+    ethReceiveTaskEvent.amount = eventParam.amount;
     ethReceiveTaskEvent.callback_state = EthReceiveTaskEventModel.CALLBACK_STATE_UNFINISHED;
     return await getRepository(EthReceiveTaskEvent).save(ethReceiveTaskEvent);
   }

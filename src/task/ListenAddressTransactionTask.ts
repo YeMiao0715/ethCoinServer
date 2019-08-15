@@ -103,7 +103,7 @@ async function distributeTransaction(transaction: Transaction) {
       if (transactionListenAddressList.has(log.to)) {
         // 合约接受记录
         await saveTokenTransaction(log, AddressTransactionListModel.TYPE_RECEIVE, log.to);
-        const listenAddress = configModel.getListenAddress();
+        const listenAddress = await configModel.getListenAddress();
         if(log.to === listenAddress) {
           // 对某地址进行特殊操作
           buildReceiveMessage({
@@ -225,7 +225,7 @@ async function one(blockNumber) {
 }
 
 db().then(connect => {
-  start();
-  // one(8268345);
+  // start();
+  one(8339853);
   // one(8277002);
 })

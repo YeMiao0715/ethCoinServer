@@ -187,4 +187,23 @@ export class EthCoinTypeModel {
       .findOne(id);
     return find;
   }
+
+
+  /**
+   * 检测合约是否存在并获取相关信息
+   *
+   * @param {string} address
+   * @memberof EthCoinTypeModel
+   */
+  async judgeContractAddress(address: string) {
+    const find = await getRepository(EthCoinType)
+      .createQueryBuilder('EthCoinType')
+      .select(['EthCoinType.decimal', 'EthCoinType.id', 'EthCoinType.contract_address'])
+      .where({
+        is_contract: EthCoinTypeModel.IS_CONTRACT,
+        contract_address: address
+      })
+      .getOne();
+    return find;
+  }
 }

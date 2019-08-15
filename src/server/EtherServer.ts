@@ -279,20 +279,23 @@ export class EtherServer {
   async analysisTransaction(transaction: string) {
     const receipt = await web3.eth.getTransactionReceipt(transaction);
     let eventTransactions = [];
-    if(receipt.logs.length) {
-      receipt.logs.map(value => {
-        const from = web3.eth.abi.decodeParameter('address', value.topics[1]);
-        const to = web3.eth.abi.decodeParameter('address', value.topics[2]);
-        const amount = web3.eth.abi.decodeParameter('uint256', value.data);
-        eventTransactions.push({
-          blockNumber: value.blockNumber,
-          hash: value.transactionHash,
-          from,
-          to,
-          amount,
-          contract: value.address,
+    const contractInfo = await this.ethCoinTypeModel.judgeContractAddress(receipt.to);
+    if(contractInfo) {
+      if(receipt.logs.length) {
+        receipt.logs.map(value => {
+          const from = web3.eth.abi.decodeParameter('address', value.topics[1]);
+          const to = web3.eth.abi.decodeParameter('address', value.topics[2]);
+          const amount = web3.eth.abi.decodeParameter('uint256', value.data);
+          eventTransactions.push({
+            blockNumber: value.blockNumber,
+            hash: value.transactionHash,
+            from,
+            to,
+            amount: new dec(amount).div(10 ** contractInfo.decimal).toString(),
+            contract: value.address,
+          });
         });
-      });
+      }
     }else{
       const receipt = await web3.eth.getTransaction(transaction);
       eventTransactions.push({
@@ -300,10 +303,11 @@ export class EtherServer {
         hash: receipt.hash,
         from: receipt.from,
         to: receipt.to,
-        amount: receipt.value,
+        amount: web3.utils.fromWei(receipt.value, 'ether'),
         contract: null,
       });
     }
+    
     return eventTransactions;
   }
 

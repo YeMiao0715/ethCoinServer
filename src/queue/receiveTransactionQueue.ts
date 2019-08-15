@@ -3,9 +3,8 @@ import { db } from '../database/database';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
 import net from 'net';
 import dotenv from 'dotenv';
-import { post } from 'request';
+import { post, Response } from 'request';
 import { ConfigModel } from '../model/databaseModel/ConfigModel';
-
 
 dotenv.config({
   path: `${__dirname}/../../.env`
@@ -57,9 +56,11 @@ async function handleData(data) {
   await notification(receiveMessage, orderID);
 }
 
-
 /**
- * 交易信息通知
+ * 交易通知
+ *
+ * @param {ReceiveMessage} receiveMessage
+ * @param {number} orderId
  */
 async function notification(receiveMessage: ReceiveMessage, orderId: number) {
   
@@ -75,10 +76,29 @@ async function notification(receiveMessage: ReceiveMessage, orderId: number) {
 
   const url = await configModel.getNotificationUrl();
   
+  await SystemRunLogModel.info('发送通知到业务服务器', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, notificationMessage);
+
   post(url, {
     form: notificationMessage
-  }, (body) => {
-    console.log(body);
+  }, async (error, res: Response, body) => {
+    if(error) {
+      throw error;
+    }
+    if(res.statusCode === 200) {
+      await ethReceiveTaskEventModel.updateEventState(orderId, {
+        callback_state: EthReceiveTaskEventModel.CALLBACK_STATE_SUCCESS,
+        callback_state_message: body
+      })
+    }else{
+      await ethReceiveTaskEventModel.updateEventState(orderId, {
+        callback_state: EthReceiveTaskEventModel.CALLBACK_STATE_ERROR,
+        callback_state_message: body
+      })
+    }
+    await SystemRunLogModel.info('接受服务器返回信息', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, {
+      code: res.statusCode,
+      body
+    });
   })
 }
 
