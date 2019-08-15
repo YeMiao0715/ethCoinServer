@@ -84,10 +84,16 @@ async function notification(receiveMessage: ReceiveMessage, orderId: number) {
     if(error) {
       throw error;
     }
+    
     if(res.statusCode === 200) {
       await ethReceiveTaskEventModel.updateEventState(orderId, {
         callback_state: EthReceiveTaskEventModel.CALLBACK_STATE_SUCCESS,
-        callback_state_message: body
+        callback_state_message: JSON.parse(body)
+      })
+    }else if(res.statusCode === 400){
+      await ethReceiveTaskEventModel.updateEventState(orderId, {
+        callback_state: EthReceiveTaskEventModel.CALLBACK_STATE_ERROR,
+        callback_state_message: JSON.parse(body)
       })
     }else{
       await ethReceiveTaskEventModel.updateEventState(orderId, {
@@ -95,9 +101,10 @@ async function notification(receiveMessage: ReceiveMessage, orderId: number) {
         callback_state_message: body
       })
     }
+
     await SystemRunLogModel.info('接受服务器返回信息', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, {
       code: res.statusCode,
-      body
+      body: body
     });
   })
 }
