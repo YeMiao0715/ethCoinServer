@@ -90,7 +90,7 @@ async function notification(receiveMessage: ReceiveMessage, orderId: number) {
         callback_state: EthReceiveTaskEventModel.CALLBACK_STATE_SUCCESS,
         callback_state_message: JSON.parse(body)
       })
-    }else if(res.statusCode === 400){
+    }else if(res.statusCode === 400) {
       await ethReceiveTaskEventModel.updateEventState(orderId, {
         callback_state: EthReceiveTaskEventModel.CALLBACK_STATE_ERROR,
         callback_state_message: JSON.parse(body)
