@@ -35,6 +35,7 @@ export class AddressTransactionListModel {
       .select(['transaction.id'])
       .where({
         address_id: addressId,
+        coin_id: coinId,
         block_number: blockNumber,
         hash
       }).getOne();

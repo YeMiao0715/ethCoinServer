@@ -93,6 +93,7 @@ async function distributeTransaction(transaction: Transaction) {
     for (const log of logs) {
       if (transactionListenAddressList.has(log.from)) {
         // 合约send记录
+        await saveContractTransaction(log, AddressTransactionListModel.TYPE_SEND, log.from);
         await saveTokenTransaction(log, AddressTransactionListModel.TYPE_SEND, log.from);
       }
 
@@ -115,7 +116,7 @@ async function distributeTransaction(transaction: Transaction) {
       }
     }
   }else{
-    // 分发合约记录
+    // 分发eth交易记录
     if (transactionListenAddressList.has(transaction.from)) {
       // send记录
       await saveEthTransaction(transaction, AddressTransactionListModel.TYPE_SEND, transaction.from);
@@ -153,6 +154,35 @@ async function saveEthTransaction(transaction: Transaction, type: number, eventA
 
 
 /**
+ * 保存合约执行日志
+ * @param {Transaction} transaction
+ * @param {number} type
+ * @param {string} eventAddress
+ */
+async function saveContractTransaction(transaction: any, type: number, eventAddress: string) {
+  await SystemRunLogModel.info('处理hash ' + transaction.hash, SystemRunLogModel.SCENE_LIENT_INFO);
+  const addressId = transactionListenAddressIndex.get(eventAddress);
+  const ethInfo = await ethCoinTypeModel.getEthInfo();
+  try {
+    await addressTransactionListModel.saveTransaction(
+      type,
+      addressId,
+      ethInfo.id,
+      transaction.blockNumber,
+      transaction.hash,
+      transaction.from,
+      transaction.to,
+      '0',
+      transaction
+    )
+    await listenAddressModel.updateBlockNumber(addressId, transaction.blockNumber, 0);  
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+/**
  * 保存token交易消息
  * @param {*} transaction
  * @param {number} type
@@ -162,7 +192,6 @@ async function saveTokenTransaction(transaction: any, type: number, eventAddress
   await SystemRunLogModel.info('处理hash ' + transaction.hash, SystemRunLogModel.SCENE_LIENT_INFO);
   const addressId = transactionListenAddressIndex.get(eventAddress);
   const contractId = contractListenIndex.get(transaction.contract);
-  const tokenInfo = await ethCoinTypeModel.getContractInfoOfId(contractId);
   try {
     await addressTransactionListModel.saveTransaction(
       type,
@@ -221,7 +250,7 @@ async function one(blockNumber) {
 }
 
 db().then(connect => {
-  start();
-  // one(8339853);
+  // start();
+  one(8379324);
   // one(8277002);
 })
