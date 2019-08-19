@@ -1,14 +1,9 @@
 import { EthReceiveTaskEventModel, ReceiveMessage } from '../model/databaseModel/EthReceiveTaskEventModel';
 import { db } from '../database/database';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
-import net from 'net';
-import dotenv from 'dotenv';
 import { post, Response } from 'request';
 import { ConfigModel } from '../model/databaseModel/ConfigModel';
-
-dotenv.config({
-  path: `${__dirname}/../../.env`
-});
+import Seneca from 'seneca';
 
 // 通知信息对象
 interface NotificationMessage {
@@ -21,29 +16,26 @@ interface NotificationMessage {
   extends: object;
 }
 
-const port = process.env.RECEIVE_QUEUE_PORT;
+const seneca = Seneca();
 
 const ethReceiveTaskEventModel = new EthReceiveTaskEventModel;
 const configModel = new ConfigModel;
 
 db().then(connect => {
-  const server = net.createServer((socket) => {
-    socket.on('data', data => {
-      const str = Buffer.from(data).toString('utf8');
-      handleData(str);
-    })
-    socket.end('end');
-  }).on('error', (error) => {
-    console.log(error);
+  seneca
+  .use('seneca-amqp-transport')
+  .add('cmd:receive', function(req, done) {
+    handleData(req.transaction)
+    return done(null, { ok: true, when: Date.now() });
   })
-
-  server.listen(port, () => {
-    SystemRunLogModel.info('eth交易接受数据处理服务开启', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, server.address());
-  })
+  .listen({
+    type: 'amqp',
+    pin: 'cmd:receive',
+    url: process.env.AMQP_URL
+  });
 });
 
-async function handleData(data) {
-  const receiveMessage = transformType(data);
+async function handleData(receiveMessage: ReceiveMessage) {
   await SystemRunLogModel.info('接受信息', SystemRunLogModel.SCENE_RECEIVET_RANSACTION_EVENT, receiveMessage);
   let orderID: number;
   if(receiveMessage.contract === null) {
@@ -107,14 +99,4 @@ async function notification(receiveMessage: ReceiveMessage, orderId: number) {
       body: body
     });
   })
-}
-
-/**
- * 转换类型
- *
- * @param {*} data
- * @returns {ReceiveMessage}
- */
-function transformType(data): ReceiveMessage{
-  return JSON.parse(data);
 }

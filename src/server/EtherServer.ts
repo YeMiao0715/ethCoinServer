@@ -167,7 +167,7 @@ export class EtherServer {
       data[key] = buildSendObject[key];
     })
 
-    return data;
+    return data as any;
   }
 
   /**
@@ -258,6 +258,7 @@ export class EtherServer {
    * @memberof EtherServer
    */
   async validatorPrivateKey(privateKey: string, address: string) {
+    privateKey = privateKey.replace('0x', '');
     try {
       const privateKeyObj = wallet.fromPrivateKey(Buffer.from(privateKey, 'hex'));  
       const privateKeyToAddress = privateKeyObj.getChecksumAddressString();

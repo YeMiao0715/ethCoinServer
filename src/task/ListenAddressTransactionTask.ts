@@ -11,6 +11,17 @@ import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
 import net from 'net';
 import dotenv from 'dotenv';
 import { ReceiveMessage } from '../model/databaseModel/EthReceiveTaskEventModel';
+import Seneca from 'seneca'
+
+const seneca = Seneca();
+
+const receive = seneca
+.use('seneca-amqp-transport')
+.client({
+  type: 'amqp',
+  pin: 'cmd:receive',
+  url: process.env.AMQP_URL
+});
 
 dotenv.config({
   path: `${__dirname}/../../.env`
@@ -171,7 +182,7 @@ async function saveContractTransaction(transaction: any, type: number, eventAddr
       transaction.blockNumber,
       transaction.hash,
       transaction.from,
-      transaction.to,
+      transaction.contract,
       '0',
       transaction
     )
@@ -211,7 +222,17 @@ async function saveTokenTransaction(transaction: any, type: number, eventAddress
 }
 
 async function buildReceiveMessage(transaction: ReceiveMessage) {
-  net.connect(process.env.RECEIVE_QUEUE_PORT).write(JSON.stringify(transaction));
+  receive.act('cmd:receive', {
+    transaction: transaction
+  }, (err, res) => {
+    if (err) {
+      // Handle error in some way
+      throw err;
+    }
+    // Print out the response
+    console.log(res);
+  });
+  // net.connect(process.env.RECEIVE_QUEUE_PORT).write(JSON.stringify(transaction));
 }
 
 /**
@@ -250,7 +271,7 @@ async function one(blockNumber) {
 }
 
 db().then(connect => {
-  // start();
-  one(8379324);
+  start();
+  // one(8379324);
   // one(8277002);
 })

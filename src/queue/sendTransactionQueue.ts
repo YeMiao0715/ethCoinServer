@@ -1,33 +1,26 @@
 import { EthSendTaskEventModel } from '../model/databaseModel/EthSendTaskEventModel';
 import { db } from '../database/database';
 import { SystemRunLogModel } from '../model/databaseModel/SystemRunLogModel';
-import net from 'net';
-import dotenv from 'dotenv';
 import { TransactionModel } from '../model/ether/TransactionModel';
-dotenv.config({
-  path: `${__dirname}/../../.env`
-});
+import Seneca from 'seneca';
 
-const port = process.env.SEND_QUEUE_PORT;
-
+const seneca = Seneca();
 db().then(connect => {
-  const server = net.createServer((socket) => {
-    socket.on('data', data => {
-      const str = Buffer.from(data).toString('utf8');
-      handleData(str);
-    })
-    socket.end('end');
-  }).on('error', (error) => {
-    console.log(error);
+  seneca
+  .use('seneca-amqp-transport')
+  .add('cmd:send', function(req, done) {
+    console.log(req.buildSendObject);
+    handleData(req.buildSendObject)
+    return done(null, { ok: true, when: Date.now() });
   })
-
-  server.listen(port, () => {
-    SystemRunLogModel.info('eth提币服务开启', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, server.address());
-  })
+  .listen({
+    type: 'amqp',
+    pin: 'cmd:send',
+    url: process.env.AMQP_URL
+  });
 });
 
 async function handleData(data) {
-  data = JSON.parse(data);
   SystemRunLogModel.info('接收到数据', SystemRunLogModel.SCENE_SEND_TRANSACTION_EVENT, data);
   let orderId = data.id;
   delete data.id;

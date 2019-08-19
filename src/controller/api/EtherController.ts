@@ -4,7 +4,15 @@ import { checkAddress } from '../../lib/utils';
 import net from 'net';
 import { isNumeric } from 'validator';
 const router = new Router();
+import seneca from 'seneca'
 
+const send = seneca()
+  .use('seneca-amqp-transport')
+  .client({
+    type: 'amqp',
+    pin: 'cmd:send',
+    url: process.env.AMQP_URL
+  });
 
 /**
  * eth 获取账户余额
@@ -121,10 +129,26 @@ router.post('/sendTransaction/:coinName', async (ctx, next) => {
 
   try {
     const buildSendObject = await etherServer.buildSendTransactionObject(from, to, amount, coinName);
+
     buildSendObject['privateKey'] = privateKey;
-    net.connect(process.env.SEND_QUEUE_PORT).write(JSON.stringify(buildSendObject));
-    delete buildSendObject['privateKey'];
-    ctx.body = buildSendObject;
+    
+    send.act('cmd:send', {
+      buildSendObject
+    }, (err, res) => {
+      if(err) console.log(err);
+      console.log(res);
+    })
+
+    ctx.body = {
+      id: buildSendObject.id,
+      from: buildSendObject.from,
+      to: buildSendObject.to,
+      nonce: buildSendObject.nonce,
+      gasPrice: buildSendObject.gasPrice,
+      gasLimit: buildSendObject.gasLimit,
+      data: buildSendObject.data,
+    };
+    
   } catch (error) {
     ctx.throw(400, error.message);
   }

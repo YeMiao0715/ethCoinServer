@@ -6,6 +6,7 @@
    "author": "YeMiao",
    "license": "MIT",
    "dependencies": {
+      "@types/seneca": "^2.1.9",
       "decimal.js": "^10.2.0",
       "dotenv": "^8.0.0",
       "ethereumjs-tx": "^2.1.0",
@@ -19,6 +20,8 @@
       "redis": "^2.8.0",
       "reflect-metadata": "^0.1.10",
       "request": "^2.88.0",
+      "seneca": "^3.13.3",
+      "seneca-amqp-transport": "^2.2.0",
       "typeorm": "0.2.18",
       "validator": "^11.1.0",
       "web3": "^1.2.0"
