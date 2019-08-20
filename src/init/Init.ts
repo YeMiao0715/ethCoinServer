@@ -15,7 +15,7 @@ db().then(async connect => {
   const configModel = new ConfigModel;
 
   await configModel.save(configModel.listenAddress, '0x6d1056f53a24Ee9052898bCc30AbCc40166eebad', '监听孪生地址');
-  await configModel.save(configModel.notificationUrl, '', '孪生交易通知地址');
+  await configModel.save(configModel.notificationUrl, 'https://api.cyber-department.io/eth/twinBorn', '孪生交易通知地址');
 
   await connect.close();
 });
