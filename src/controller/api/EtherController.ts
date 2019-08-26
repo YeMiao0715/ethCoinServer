@@ -1,10 +1,10 @@
 import { EtherServer } from '../../server/EtherServer';
 import Router from 'koa-router';
 import { checkAddress } from '../../lib/utils';
-import net from 'net';
 import { isNumeric } from 'validator';
 const router = new Router();
 import seneca from 'seneca'
+import { getAddressTransactionList } from '../../model/ether/EthTransactionListModel';
 
 const send = seneca()
   .use('seneca-amqp-transport')
@@ -160,9 +160,9 @@ router.post('/sendTransaction/:coinName', async (ctx, next) => {
 router.get('/getTransactionList/:address/:coin_name', async (ctx, next) => {
   let address = ctx.params.address;
   let coin_name = ctx.params.coin_name;
-  let type = ctx.query.type ? ctx.query.type : 'all';
+  let type = ctx.query.type ? ctx.query.type : 0;
   let page = ctx.query.page ? ctx.query.page : 1;
-  let limit = ctx.query.limit ? ctx.query.limit : 20;
+  let limit = ctx.query.limit ? ctx.query.limit : 1;
 
   if (address !== undefined) {
     try {
@@ -172,20 +172,12 @@ router.get('/getTransactionList/:address/:coin_name', async (ctx, next) => {
     }
   }
 
-  if (!isNumeric(type)) {
-    if (type !== 'all') {
-      ctx.throw(400, '类型必须为数字或all');
-    }
-  }
-
   try {
-    const etherServer = new EtherServer;
-    const list = await etherServer.getUserTransactionList(address, coin_name, type, page, limit);
+    let list = await getAddressTransactionList(address, coin_name, parseInt(type), page, limit);
     ctx.body = list
   } catch (error) {
     ctx.throw(400, error.message);
   }
 })
-
 
 export default router;
