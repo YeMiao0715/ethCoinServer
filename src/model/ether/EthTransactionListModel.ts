@@ -1,6 +1,6 @@
 import { get } from 'request';
 import { EthCoinTypeModel } from '../databaseModel/EthCoinTypeModel';
-import { db } from '../../database/database';
+import dec from 'decimal.js';
 
 const url = 'http://api.etherscan.io/api';
 
@@ -33,12 +33,14 @@ export const getTransactionOfEthList = function (address: string, type: number, 
           // 获取全部
           switch(type) {
             case typeAll: 
-              resolve(data.result);
+              for(const transaction of data.result) {
+                list.push(handleTransaction(transaction))
+              }
             break;
             case typeSend: 
               for(const transaction of data.result) {
                 if(transaction.from == address) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -46,7 +48,7 @@ export const getTransactionOfEthList = function (address: string, type: number, 
             case typeReceive: 
               for(const transaction of data.result) {
                 if(transaction.to == address) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -54,7 +56,7 @@ export const getTransactionOfEthList = function (address: string, type: number, 
             case typeError: 
               for(const transaction of data.result) {
                 if(transaction.isError == 1) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -106,7 +108,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
             case typeAll: 
               for(const transaction of data.result) {
                 if(transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -114,7 +116,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
             case typeSend: 
               for(const transaction of data.result) {
                 if(transaction.from == address && transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -122,7 +124,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
             case typeReceive: 
               for(const transaction of data.result) {
                 if(transaction.to == address && transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -130,7 +132,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
             case typeError: 
               for(const transaction of data.result) {
                 if(transaction.isError == 1 && transaction.contractAddress == contractAddress) {
-                  list.push(transaction)
+                  list.push(handleTransaction(transaction))
                 }
               }
               resolve(list);
@@ -143,6 +145,16 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
       }
     })
   })
+}
+
+const handleTransaction = function(transaction: any) {
+  transaction['gasToEth'] = new dec(transaction.gas).mul(transaction.gasPrice).toFixed();
+  if(transaction.tokenSymbol !== undefined) {
+    transaction['value'] = new dec(transaction.value).div(10 ** transaction.tokenDecimal).toFixed();
+  }else{
+    transaction.value = new dec(transaction.value).div(10 ** 18).toFixed();
+  }
+  return transaction;
 }
 
 export const paresQuery = function (obj: object): string {
