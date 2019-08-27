@@ -98,7 +98,7 @@ router.post('/sendTransaction/:coinName', async (ctx, next) => {
   let from = post.from;
   let to = post.to;
   let amount = post.amount;
-  let coinName = ctx.params.coinName;
+  let coinName = ctx.params.coinName.toLowerCase();
   let privateKey = post.privateKey;
 
   try {
@@ -159,7 +159,7 @@ router.post('/sendTransaction/:coinName', async (ctx, next) => {
  */
 router.get('/getTransactionList/:address/:coin_name', async (ctx, next) => {
   let address = ctx.params.address;
-  let coin_name = ctx.params.coin_name;
+  let coin_name = ctx.params.coin_name.toLowerCase();
   let type = ctx.query.type ? ctx.query.type : 0;
   let page = ctx.query.page ? ctx.query.page : 1;
   let limit = ctx.query.limit ? ctx.query.limit : 20;
