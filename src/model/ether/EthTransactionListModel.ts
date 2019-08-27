@@ -148,7 +148,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
 }
 
 const handleTransaction = function(transaction: any) {
-  transaction['gasToEth'] = new dec(transaction.gas).mul(transaction.gasPrice).toFixed();
+  transaction['gasToEth'] = new dec(transaction.gas).mul(transaction.gasPrice).div(10 ** 18).toFixed();
   if(transaction.tokenSymbol !== undefined) {
     transaction['value'] = new dec(transaction.value).div(10 ** transaction.tokenDecimal).toFixed();
   }else{
