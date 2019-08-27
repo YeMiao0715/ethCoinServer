@@ -43,7 +43,6 @@ export const getTransactionOfEthList = function (address: string, type: number, 
                   list.push(handleTransaction(transaction))
                 }
               }
-              resolve(list);
             break;
             case typeReceive: 
               for(const transaction of data.result) {
@@ -51,7 +50,6 @@ export const getTransactionOfEthList = function (address: string, type: number, 
                   list.push(handleTransaction(transaction))
                 }
               }
-              resolve(list);
             break;
             case typeError: 
               for(const transaction of data.result) {
@@ -59,10 +57,10 @@ export const getTransactionOfEthList = function (address: string, type: number, 
                   list.push(handleTransaction(transaction))
                 }
               }
-              resolve(list);
+              
             break;
           } 
-          
+          resolve(list);
         }else{
           reject('服务异常')
         }
@@ -100,6 +98,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
       if(error) {
         reject(error);
       }else{
+        
         let data = JSON.parse(body);
         if(data.status == 1) {
           let list = [];
@@ -111,34 +110,30 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
                   list.push(handleTransaction(transaction))
                 }
               }
-              resolve(list);
             break;
             case typeSend: 
               for(const transaction of data.result) {
-                if(transaction.from == address && transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
+                if(transaction.from.toLowerCase() == address.toLowerCase() && transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
                   list.push(handleTransaction(transaction))
                 }
               }
-              resolve(list);
             break;
             case typeReceive: 
               for(const transaction of data.result) {
-                if(transaction.to == address && transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
+                if(transaction.to.toLowerCase() == address.toLowerCase() && transaction.contractAddress.toLowerCase() == contractAddress.toLowerCase()) {
                   list.push(handleTransaction(transaction))
                 }
               }
-              resolve(list);
             break;
             case typeError: 
-              for(const transaction of data.result) {
-                if(transaction.isError == 1 && transaction.contractAddress == contractAddress) {
-                  list.push(handleTransaction(transaction))
-                }
-              }
-              resolve(list);
+              // for(const transaction of data.result) {
+              //   if(transaction.isError == 1 && transaction.contractAddress == contractAddress) {
+              //     list.push(handleTransaction(transaction))
+              //   }
+              // }
             break;
           } 
-          
+          resolve(list);
         }else{
           reject('服务异常')
         }
