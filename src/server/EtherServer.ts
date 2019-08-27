@@ -34,7 +34,7 @@ export class EtherServer {
    */
   async getAccountAmount(address: string, coinName: string = 'all') {
     let amountObj = [];
-    switch (coinName) {
+    switch (coinName.toLowerCase()) {
       case 'eth':
         return {
           name: 'eth',
