@@ -39,14 +39,14 @@ export const getTransactionOfEthList = function (address: string, type: number, 
             break;
             case typeSend: 
               for(const transaction of data.result) {
-                if(transaction.from == address) {
+                if(transaction.from.toLowerCase() == address.toLowerCase()) {
                   list.push(handleTransaction(transaction))
                 }
               }
             break;
             case typeReceive: 
               for(const transaction of data.result) {
-                if(transaction.to == address) {
+                if(transaction.to.toLowerCase() == address.toLowerCase()) {
                   list.push(handleTransaction(transaction))
                 }
               }
@@ -163,7 +163,7 @@ export const paresQuery = function (obj: object): string {
 
 export const getAddressTransactionList = async function (address: string, coinName: string, type: number, page: number = 1, offset: number = 20) {
   let data: any;
-  switch(coinName) {
+  switch(coinName.toLowerCase()) {
     case 'eth': 
       data = await getTransactionOfEthList(address, type, page, offset);
     break;
