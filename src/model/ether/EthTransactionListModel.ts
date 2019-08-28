@@ -62,7 +62,7 @@ export const getTransactionOfEthList = function (address: string, type: number, 
           } 
           resolve(list);
         }else{
-          reject('服务异常')
+          resolve([]);
         }
       }
     })
@@ -135,7 +135,7 @@ export const getTransactionOfTokenList = async function (address: string,coinNam
           } 
           resolve(list);
         }else{
-          reject('服务异常')
+          resolve([]);
         }
       }
     })
